@@ -15,6 +15,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Free Phishing URL Checker & Email Link Scanner | Sendmarc",
   description: "Check any URL or email for phishing threats instantly. Free phishing link checker with VirusTotal & Google Safe Browsing. Analyze suspicious links and protect your business from email phishing attacks.",
+  icons: {
+    icon: "/favicon.ico",
+  },
   keywords: [
     "phishing checker",
     "phishing url scanner",
