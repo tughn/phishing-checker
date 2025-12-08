@@ -278,8 +278,20 @@ export default function Home() {
                 <div className="text-5xl font-bold mb-2" style={{ color: '#0073EA' }}>
                   {result.riskScore}
                 </div>
-                <div className={`text-xl font-semibold ${getRiskColor(result.riskLevel)}`}>
+                <div className={`text-xl font-semibold mb-2 ${getRiskColor(result.riskLevel)}`}>
                   {result.riskLevel}
+                </div>
+                <div className="text-sm text-gray-600 space-y-1">
+                  {result.checks.virustotal?.malicious > 0 && (
+                    <div>{result.checks.virustotal.malicious} security engines flagged this</div>
+                  )}
+                  {result.checks.safeBrowsing?.safe === false && (
+                    <div>Google detected phishing threat</div>
+                  )}
+                  {!result.checks.ssl?.secure && (
+                    <div>Not using secure HTTPS</div>
+                  )}
+                  {result.riskScore === 0 && <div>No threats detected</div>}
                 </div>
               </div>
             </div>
@@ -349,6 +361,34 @@ export default function Home() {
         {/* Multi URL Results */}
         {multiResult && (
           <div className="space-y-6">
+            {/* Overall Email Risk */}
+            <div className={`rounded-lg border p-6 ${
+              multiResult.highRiskCount > 0 ? 'bg-red-50 border-red-200' :
+              multiResult.mediumRiskCount > 0 ? 'bg-orange-50 border-orange-200' :
+              multiResult.lowRiskCount > 0 ? 'bg-yellow-50 border-yellow-200' :
+              'bg-green-50 border-green-200'
+            }`}>
+              <div className="text-center">
+                <div className={`text-2xl font-bold mb-2 ${
+                  multiResult.highRiskCount > 0 ? 'text-red-600' :
+                  multiResult.mediumRiskCount > 0 ? 'text-orange-600' :
+                  multiResult.lowRiskCount > 0 ? 'text-yellow-600' :
+                  'text-green-600'
+                }`}>
+                  {multiResult.highRiskCount > 0 ? 'HIGH RISK EMAIL' :
+                   multiResult.mediumRiskCount > 0 ? 'MEDIUM RISK EMAIL' :
+                   multiResult.lowRiskCount > 0 ? 'LOW RISK EMAIL' :
+                   'SAFE EMAIL'}
+                </div>
+                <div className="text-sm text-gray-600">
+                  {multiResult.highRiskCount > 0 && `${multiResult.highRiskCount} high risk link${multiResult.highRiskCount > 1 ? 's' : ''} detected`}
+                  {multiResult.mediumRiskCount > 0 && !multiResult.highRiskCount && `${multiResult.mediumRiskCount} medium risk link${multiResult.mediumRiskCount > 1 ? 's' : ''} detected`}
+                  {multiResult.lowRiskCount > 0 && !multiResult.highRiskCount && !multiResult.mediumRiskCount && `${multiResult.lowRiskCount} low risk link${multiResult.lowRiskCount > 1 ? 's' : ''} detected`}
+                  {multiResult.safeCount === multiResult.totalUrls && 'All links are safe'}
+                </div>
+              </div>
+            </div>
+
             <div className="bg-white rounded-lg border border-gray-200 p-6">
               <h3 className="text-lg font-semibold mb-4 text-gray-900">Summary</h3>
 
