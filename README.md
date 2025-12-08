@@ -1,6 +1,6 @@
 # Sendmarc Phishing URL Checker
 
-**Live Demo:** [https://phishing-checker-5y86g148o-tughan-caydavuls-projects.vercel.app](https://phishing-checker-5y86g148o-tughan-caydavuls-projects.vercel.app)
+**Live Demo:** [https://phishing-checker-p2l06b267-tughan-caydavuls-projects.vercel.app](https://phishing-checker-p2l06b267-tughan-caydavuls-projects.vercel.app)
 
 A free, production-ready tool to check URLs and email content for phishing threats using VirusTotal and Google Safe Browsing.
 
@@ -51,8 +51,8 @@ A free, production-ready tool to check URLs and email content for phishing threa
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/tughn/sendmarc-phishing-checker.git
-cd sendmarc-phishing-checker
+git clone https://github.com/tughn/phishing-checker.git
+cd phishing-checker
 ```
 
 ### 2. Install dependencies
@@ -91,7 +91,7 @@ npm start
 
 ### Deploy to Vercel
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/tughn/sendmarc-phishing-checker)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/tughn/phishing-checker)
 
 1. Connect your GitHub repository to Vercel
 2. Add environment variables in Vercel dashboard:
