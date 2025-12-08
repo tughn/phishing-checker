@@ -28,6 +28,7 @@ interface MultiUrlResult {
 
 export default function Home() {
   const [mode, setMode] = useState<'url' | 'email'>('url');
+  const [showDetections, setShowDetections] = useState<boolean>(false);
   const [url, setUrl] = useState('');
   const [emailContent, setEmailContent] = useState('');
   const [loading, setLoading] = useState(false);
@@ -329,6 +330,34 @@ export default function Home() {
                         <div className="text-xs text-gray-600 mt-1">Undetected</div>
                       </div>
                     </div>
+
+                    {result.checks.virustotal.detections && result.checks.virustotal.detections.length > 0 && (
+                      <div className="mt-4">
+                        <button
+                          onClick={() => setShowDetections(!showDetections)}
+                          className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                        >
+                          {showDetections ? '▼' : '▶'} Show which engines flagged this ({result.checks.virustotal.detections.length})
+                        </button>
+
+                        {showDetections && (
+                          <div className="mt-3 p-3 bg-gray-50 rounded border border-gray-200 max-h-60 overflow-y-auto">
+                            <div className="space-y-2 text-sm">
+                              {result.checks.virustotal.detections.map((detection: any, idx: number) => (
+                                <div key={idx} className="flex justify-between items-center py-1 border-b border-gray-200 last:border-0">
+                                  <span className="font-medium text-gray-700">{detection.engine}</span>
+                                  <span className={`px-2 py-1 rounded text-xs ${
+                                    detection.category === 'malicious' ? 'bg-red-100 text-red-700' : 'bg-orange-100 text-orange-700'
+                                  }`}>
+                                    {detection.category}: {detection.result}
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 )}
 

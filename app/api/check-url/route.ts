@@ -110,12 +110,24 @@ export async function POST(request: NextRequest) {
       );
 
       const stats = vtResponse.data.data.attributes.last_analysis_stats;
+      const analysisResults = vtResponse.data.data.attributes.last_analysis_results;
+
+      // Extract which engines flagged it
+      const detections = Object.entries(analysisResults)
+        .filter(([_, result]: [string, any]) => result.category === 'malicious' || result.category === 'suspicious')
+        .map(([engine, result]: [string, any]) => ({
+          engine,
+          category: result.category,
+          result: result.result
+        }));
+
       results.checks.virustotal = {
         malicious: stats.malicious,
         suspicious: stats.suspicious,
         undetected: stats.undetected,
         harmless: stats.harmless,
-        total_engines: Object.keys(vtResponse.data.data.attributes.last_analysis_results).length,
+        total_engines: Object.keys(analysisResults).length,
+        detections: detections
       };
     } catch (error: any) {
       if (error.response?.status === 404) {
