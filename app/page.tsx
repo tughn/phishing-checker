@@ -29,6 +29,7 @@ interface MultiUrlResult {
 export default function Home() {
   const [mode, setMode] = useState<'url' | 'email'>('url');
   const [showDetections, setShowDetections] = useState<boolean>(false);
+  const [expandedUrlIndex, setExpandedUrlIndex] = useState<number | null>(null);
   const [url, setUrl] = useState('');
   const [emailContent, setEmailContent] = useState('');
   const [loading, setLoading] = useState(false);
@@ -467,6 +468,34 @@ export default function Home() {
                         )}
                         {!res.checks.ssl?.secure && <span className="text-orange-600">No HTTPS</span>}
                       </div>
+
+                      {res.checks.virustotal?.detections && res.checks.virustotal.detections.length > 0 && (
+                        <div className="mt-3">
+                          <button
+                            onClick={() => setExpandedUrlIndex(expandedUrlIndex === idx ? null : idx)}
+                            className="text-xs text-blue-600 hover:text-blue-800 font-medium"
+                          >
+                            {expandedUrlIndex === idx ? '▼' : '▶'} Show which engines flagged this ({res.checks.virustotal.detections.length})
+                          </button>
+
+                          {expandedUrlIndex === idx && (
+                            <div className="mt-2 p-2 bg-gray-50 rounded border border-gray-200 max-h-40 overflow-y-auto">
+                              <div className="space-y-1 text-xs">
+                                {res.checks.virustotal.detections.map((detection: any, detIdx: number) => (
+                                  <div key={detIdx} className="flex justify-between items-center py-1 border-b border-gray-200 last:border-0">
+                                    <span className="font-medium text-gray-700">{detection.engine}</span>
+                                    <span className={`px-2 py-0.5 rounded text-xs ${
+                                      detection.category === 'malicious' ? 'bg-red-100 text-red-700' : 'bg-orange-100 text-orange-700'
+                                    }`}>
+                                      {detection.category}: {detection.result}
+                                    </span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
                     <div className="text-2xl font-bold" style={{ color: '#0073EA' }}>
                       {res.riskScore}
