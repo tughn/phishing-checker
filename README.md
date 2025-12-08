@@ -168,7 +168,7 @@ phishing-checker/
 │   ├── api/check-url/route.ts    # API endpoint with rate limiting
 │   ├── page.tsx                   # Main UI with dual input modes
 │   ├── layout.tsx                 # SEO metadata and structured data
-│   └── globals.css                # Sendmarc brand styling
+│   └── globals.css                # Styling
 ├── .env.local                     # Environment variables (not in Git)
 ├── .env.example                   # Template for required variables
 ├── DEPLOYMENT.md                  # Deployment guide
@@ -185,18 +185,6 @@ phishing-checker/
 - VirusTotal: 500 requests/day
 - Google Safe Browsing: 10,000 requests/day
 - Vercel: Unlimited hosting
-
----
-
-## Contributing
-
-This is a Sendmarc internal tool. For issues or suggestions, please contact the development team.
-
----
-
-## License
-
-Proprietary - Sendmarc
 
 ---
 
