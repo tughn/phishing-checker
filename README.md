@@ -1,6 +1,6 @@
 # Sendmarc Phishing URL Checker
 
-**Live Demo:** [https://phishing-checker-p2l06b267-tughan-caydavuls-projects.vercel.app](https://phishing-checker-p2l06b267-tughan-caydavuls-projects.vercel.app)
+**Live Demo:** [https://phishing-checker-zeta.vercel.app](https://phishing-checker-zeta.vercel.app)
 
 A free, production-ready tool to check URLs and email content for phishing threats using VirusTotal and Google Safe Browsing.
 
