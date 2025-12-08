@@ -221,23 +221,41 @@ export async function POST(request: NextRequest) {
     let riskScore = 0;
     let maxScore = 100;
 
-    // VirusTotal scoring (40 points)
+    // VirusTotal scoring (up to 70 points)
     if (results.checks.virustotal?.malicious) {
-      riskScore += Math.min(results.checks.virustotal.malicious * 10, 40);
+      // 1-2 engines: 20 points (likely false positive)
+      // 3-4 engines: 40 points (suspicious)
+      // 5-9 engines: 60 points (high risk)
+      // 10+ engines: 70 points (critical threat)
+      if (results.checks.virustotal.malicious >= 10) {
+        riskScore += 70;
+      } else if (results.checks.virustotal.malicious >= 5) {
+        riskScore += 60;
+      } else if (results.checks.virustotal.malicious >= 3) {
+        riskScore += 40;
+      } else {
+        riskScore += results.checks.virustotal.malicious * 10;
+      }
     }
 
-    // Safe Browsing scoring (40 points)
+    // Suspicious flags (up to 10 points)
+    if (results.checks.virustotal?.suspicious) {
+      riskScore += Math.min(results.checks.virustotal.suspicious * 5, 10);
+    }
+
+    // Safe Browsing scoring (20 points)
     if (results.checks.safeBrowsing?.threats?.length > 0) {
-      riskScore += 40;
+      riskScore += 20;
     }
 
-    // SSL scoring (20 points)
+    // SSL scoring (10 points)
     if (!results.checks.ssl?.secure) {
-      riskScore += 20;
+      riskScore += 10;
     }
 
     results.riskScore = Math.min(riskScore, maxScore);
     results.riskLevel =
+      riskScore >= 90 ? 'DANGER' :
       riskScore >= 70 ? 'HIGH' :
       riskScore >= 40 ? 'MEDIUM' :
       riskScore >= 20 ? 'LOW' :

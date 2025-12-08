@@ -31,6 +31,11 @@ body {
   padding: 0;
 }
 
+/* Smooth transitions for all interactive elements */
+* {
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, opacity 0.2s ease;
+}
+
 /* Sendmarc Button Styles */
 .btn-sendmarc {
   border: 1px solid var(--sendmarc-primary);

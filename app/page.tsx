@@ -20,6 +20,7 @@ interface MultiUrlResult {
   urls: string[];
   results: CheckResult[];
   totalUrls: number;
+  dangerRiskCount: number;
   highRiskCount: number;
   mediumRiskCount: number;
   lowRiskCount: number;
@@ -86,7 +87,7 @@ export default function Home() {
       }
 
       const results: CheckResult[] = [];
-      let highRisk = 0, mediumRisk = 0, lowRisk = 0, safe = 0;
+      let dangerRisk = 0, highRisk = 0, mediumRisk = 0, lowRisk = 0, safe = 0;
 
       for (const url of urls) {
         try {
@@ -101,7 +102,8 @@ export default function Home() {
           if (response.ok) {
             results.push(data);
 
-            if (data.riskLevel === 'HIGH') highRisk++;
+            if (data.riskLevel === 'DANGER') dangerRisk++;
+            else if (data.riskLevel === 'HIGH') highRisk++;
             else if (data.riskLevel === 'MEDIUM') mediumRisk++;
             else if (data.riskLevel === 'LOW') lowRisk++;
             else safe++;
@@ -115,6 +117,7 @@ export default function Home() {
         urls,
         results,
         totalUrls: urls.length,
+        dangerRiskCount: dangerRisk,
         highRiskCount: highRisk,
         mediumRiskCount: mediumRisk,
         lowRiskCount: lowRisk,
@@ -129,6 +132,7 @@ export default function Home() {
 
   const getRiskColor = (level: string) => {
     switch (level) {
+      case 'DANGER': return 'text-red-700 font-bold';
       case 'HIGH': return 'text-red-600';
       case 'MEDIUM': return 'text-orange-500';
       case 'LOW': return 'text-yellow-600';
@@ -139,6 +143,7 @@ export default function Home() {
 
   const getRiskBg = (level: string) => {
     switch (level) {
+      case 'DANGER': return 'bg-red-100 border-red-300 shadow-lg';
       case 'HIGH': return 'bg-red-50 border-red-200';
       case 'MEDIUM': return 'bg-orange-50 border-orange-200';
       case 'LOW': return 'bg-yellow-50 border-yellow-200';
@@ -393,6 +398,7 @@ export default function Home() {
           <div className="space-y-6">
             {/* Overall Email Risk */}
             <div className={`rounded-lg border p-6 ${
+              multiResult.dangerRiskCount > 0 ? 'bg-red-100 border-red-300 shadow-lg' :
               multiResult.highRiskCount > 0 ? 'bg-red-50 border-red-200' :
               multiResult.mediumRiskCount > 0 ? 'bg-orange-50 border-orange-200' :
               multiResult.lowRiskCount > 0 ? 'bg-yellow-50 border-yellow-200' :
@@ -400,20 +406,23 @@ export default function Home() {
             }`}>
               <div className="text-center">
                 <div className={`text-2xl font-bold mb-2 ${
+                  multiResult.dangerRiskCount > 0 ? 'text-red-700' :
                   multiResult.highRiskCount > 0 ? 'text-red-600' :
                   multiResult.mediumRiskCount > 0 ? 'text-orange-600' :
                   multiResult.lowRiskCount > 0 ? 'text-yellow-600' :
                   'text-green-600'
                 }`}>
-                  {multiResult.highRiskCount > 0 ? 'HIGH RISK EMAIL' :
+                  {multiResult.dangerRiskCount > 0 ? 'CRITICAL DANGER - MALWARE DETECTED' :
+                   multiResult.highRiskCount > 0 ? 'HIGH RISK EMAIL' :
                    multiResult.mediumRiskCount > 0 ? 'MEDIUM RISK EMAIL' :
                    multiResult.lowRiskCount > 0 ? 'LOW RISK EMAIL' :
                    'SAFE EMAIL'}
                 </div>
                 <div className="text-sm text-gray-600">
-                  {multiResult.highRiskCount > 0 && `${multiResult.highRiskCount} high risk link${multiResult.highRiskCount > 1 ? 's' : ''} detected`}
-                  {multiResult.mediumRiskCount > 0 && !multiResult.highRiskCount && `${multiResult.mediumRiskCount} medium risk link${multiResult.mediumRiskCount > 1 ? 's' : ''} detected`}
-                  {multiResult.lowRiskCount > 0 && !multiResult.highRiskCount && !multiResult.mediumRiskCount && `${multiResult.lowRiskCount} low risk link${multiResult.lowRiskCount > 1 ? 's' : ''} detected`}
+                  {multiResult.dangerRiskCount > 0 && `${multiResult.dangerRiskCount} critical threat${multiResult.dangerRiskCount > 1 ? 's' : ''} detected`}
+                  {multiResult.highRiskCount > 0 && !multiResult.dangerRiskCount && `${multiResult.highRiskCount} high risk link${multiResult.highRiskCount > 1 ? 's' : ''} detected`}
+                  {multiResult.mediumRiskCount > 0 && !multiResult.dangerRiskCount && !multiResult.highRiskCount && `${multiResult.mediumRiskCount} medium risk link${multiResult.mediumRiskCount > 1 ? 's' : ''} detected`}
+                  {multiResult.lowRiskCount > 0 && !multiResult.dangerRiskCount && !multiResult.highRiskCount && !multiResult.mediumRiskCount && `${multiResult.lowRiskCount} low risk link${multiResult.lowRiskCount > 1 ? 's' : ''} detected`}
                   {multiResult.safeCount === multiResult.totalUrls && 'All links are safe'}
                 </div>
               </div>
@@ -422,10 +431,14 @@ export default function Home() {
             <div className="bg-white rounded-lg border border-gray-200 p-6">
               <h3 className="text-lg font-semibold mb-4 text-gray-900">Summary</h3>
 
-              <div className="grid grid-cols-5 gap-3">
+              <div className="grid grid-cols-6 gap-3">
                 <div className="bg-gray-50 p-4 rounded-lg text-center">
                   <div className="text-2xl font-bold text-gray-900">{multiResult.totalUrls}</div>
                   <div className="text-xs text-gray-600 mt-1">Total</div>
+                </div>
+                <div className="bg-red-100 p-4 rounded-lg text-center">
+                  <div className="text-2xl font-bold text-red-700">{multiResult.dangerRiskCount}</div>
+                  <div className="text-xs text-gray-600 mt-1">Danger</div>
                 </div>
                 <div className="bg-red-50 p-4 rounded-lg text-center">
                   <div className="text-2xl font-bold text-red-600">{multiResult.highRiskCount}</div>
@@ -445,7 +458,12 @@ export default function Home() {
                 </div>
               </div>
 
-              {multiResult.highRiskCount > 0 && (
+              {multiResult.dangerRiskCount > 0 && (
+                <div className="bg-red-100 border border-red-300 rounded-lg p-3 mt-4">
+                  <p className="text-red-700 text-sm font-bold">⚠ CRITICAL: Malware or phishing threats detected</p>
+                </div>
+              )}
+              {multiResult.highRiskCount > 0 && multiResult.dangerRiskCount === 0 && (
                 <div className="bg-red-50 border border-red-200 rounded-lg p-3 mt-4">
                   <p className="text-red-600 text-sm font-medium">⚠ High risk URLs detected</p>
                 </div>
