@@ -1,4 +1,4 @@
-# Sendmarc Phishing URL Checker
+# Phishing URL Checker
 
 **Live Demo:** [https://phishing-checker-zeta.vercel.app](https://phishing-checker-zeta.vercel.app)
 
