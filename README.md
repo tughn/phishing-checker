@@ -154,10 +154,6 @@ Check a URL for security threats.
 - HTTPS enforced in production
 - Environment variables excluded from version control
 
-**Security Audit Score:** 9/10 - Production ready
-
-See [SECURITY.md](SECURITY.md) for detailed security documentation.
-
 ---
 
 ## Project Structure
@@ -188,12 +184,3 @@ phishing-checker/
 
 ---
 
-## Support
-
-- **Documentation:** See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed setup instructions
-- **Security:** See [SECURITY.md](SECURITY.md) for security best practices
-- **SEO:** See [SEO_STRATEGY.md](SEO_STRATEGY.md) for ranking strategy
-
----
-
-**Built by Sendmarc** - Email security made simple
