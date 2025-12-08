@@ -1,26 +1,54 @@
 @import "tailwindcss";
 
 :root {
+  /* Sendmarc Brand Colors */
+  --sendmarc-primary: #58d0f5;
+  --sendmarc-primary-dark: #336;
+  --sendmarc-dark: #1f2124;
+  --sendmarc-gray: #69727d;
+  --sendmarc-light-gray: #d5d8dc;
+  --sendmarc-bg: #ffffff;
+
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #1f2124;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-sendmarc-primary: var(--sendmarc-primary);
+  --color-sendmarc-primary-dark: var(--sendmarc-primary-dark);
+  --color-sendmarc-dark: var(--sendmarc-dark);
+  --color-sendmarc-gray: var(--sendmarc-gray);
+  --color-sendmarc-light-gray: var(--sendmarc-light-gray);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+/* Sendmarc Button Styles */
+.btn-sendmarc {
+  border: 1px solid var(--sendmarc-primary);
+  color: var(--sendmarc-primary);
+  background: transparent;
+  padding: 0.5rem 1rem;
+  border-radius: 3px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.btn-sendmarc:hover {
+  background: var(--sendmarc-primary);
+  color: white;
+}
+
+.btn-sendmarc:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }

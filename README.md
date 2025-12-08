@@ -1,36 +1,218 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Sendmarc Phishing URL Checker
 
-## Getting Started
+A free tool to check URLs for phishing, malware, and security threats using multiple security engines.
 
-First, run the development server:
+## Features
 
+- ✅ **VirusTotal Integration** - Scans URLs against 60+ security engines
+- ✅ **Google Safe Browsing** - Checks against Google's threat database
+- ✅ **SSL/TLS Validation** - Verifies HTTPS security
+- ✅ **Risk Scoring** - 0-100 risk score with threat level classification
+- ✅ **Sendmarc Branding** - Clean, professional UI matching Sendmarc style
+- ✅ **Free to Use** - 500 checks/day (VirusTotal limit)
+
+## Tech Stack
+
+- **Next.js 16** - React framework with App Router
+- **TypeScript** - Type-safe code
+- **Tailwind CSS** - Utility-first styling
+- **VirusTotal API** - Malware/phishing detection
+- **Google Safe Browsing API** - Threat database
+- **Vercel** - Deployment platform
+
+## Setup
+
+### Prerequisites
+
+- Node.js 18+ installed
+- VirusTotal API key
+- Google Safe Browsing API key
+
+### Installation
+
+1. Install dependencies:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Create `.env.local` file:
+```bash
+VIRUSTOTAL_API_KEY=your_virustotal_api_key
+NEXT_PUBLIC_GOOGLE_SAFE_BROWSING_API_KEY=your_google_api_key
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. Run development server:
+```bash
+npm run dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+4. Open [http://localhost:3000](http://localhost:3000)
 
-## Learn More
+## API Endpoints
 
-To learn more about Next.js, take a look at the following resources:
+### POST /api/check-url
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Check a URL for security threats.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+**Request:**
+```json
+{
+  "url": "https://example.com"
+}
+```
 
-## Deploy on Vercel
+**Response:**
+```json
+{
+  "url": "https://example.com",
+  "timestamp": "2025-12-08T10:00:00.000Z",
+  "riskScore": 0,
+  "riskLevel": "SAFE",
+  "checks": {
+    "virustotal": {
+      "malicious": 0,
+      "suspicious": 0,
+      "undetected": 45,
+      "harmless": 55,
+      "total_engines": 100
+    },
+    "safeBrowsing": {
+      "safe": true,
+      "threats": []
+    },
+    "ssl": {
+      "protocol": "https:",
+      "secure": true
+    },
+    "domain": {
+      "hostname": "example.com"
+    }
+  }
+}
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Risk Scoring
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+| Risk Score | Level  | Color  |
+|------------|--------|--------|
+| 0-19       | SAFE   | Green  |
+| 20-39      | LOW    | Yellow |
+| 40-69      | MEDIUM | Orange |
+| 70-100     | HIGH   | Red    |
+
+**Scoring Breakdown:**
+- VirusTotal malicious detections: up to 40 points
+- Google Safe Browsing threats: 40 points
+- No HTTPS: 20 points
+
+## Deployment
+
+### Deploy to Vercel
+
+1. Push to GitHub:
+```bash
+git init
+git add .
+git commit -m "Initial commit: Phishing URL Checker"
+git branch -M main
+git remote add origin <your-repo-url>
+git push -u origin main
+```
+
+2. Import to Vercel:
+   - Go to https://vercel.com/new
+   - Import your GitHub repository
+   - Add environment variables:
+     - `VIRUSTOTAL_API_KEY`
+     - `NEXT_PUBLIC_GOOGLE_SAFE_BROWSING_API_KEY`
+   - Deploy!
+
+## Usage Limits (Free Tier)
+
+- **VirusTotal**: 500 requests/day, 4 requests/minute
+- **Google Safe Browsing**: 10,000 requests/day
+- **Vercel**: Unlimited hosting
+
+## Project Structure
+
+```
+phishing-checker/
+├── app/
+│   ├── api/
+│   │   └── check-url/
+│   │       └── route.ts          # API endpoint
+│   ├── globals.css               # Sendmarc branding
+│   ├── layout.tsx                # Root layout
+│   └── page.tsx                  # Main UI
+├── public/                        # Static assets
+├── .env.local                     # API keys (not in git)
+├── .gitignore                     # Excludes .env files
+├── next.config.ts                 # Next.js config
+├── package.json                   # Dependencies
+└── README.md                      # This file
+```
+
+## Security
+
+- ✅ API keys stored in `.env.local` (excluded from Git)
+- ✅ Server-side API calls (keys never exposed to client)
+- ✅ Input validation on all requests
+- ✅ CORS protection via Next.js
+- ✅ Rate limiting via API providers
+
+## Development
+
+### Start development server:
+```bash
+npm run dev
+```
+
+### Build for production:
+```bash
+npm run build
+```
+
+### Run production build:
+```bash
+npm start
+```
+
+## Testing
+
+Test with these URLs:
+
+**Safe URLs:**
+- `https://google.com`
+- `https://sendmarc.com`
+
+**Known Malicious (for testing):**
+- `http://malware.wicar.org/data/eicar.com`
+- Check VirusTotal's recent submissions
+
+## Troubleshooting
+
+### "URL not found" on VirusTotal
+- The URL hasn't been scanned yet
+- The tool will automatically submit it for scanning
+- Check again in 2-3 minutes
+
+### Image not loading
+- Verify `help.sendmarc.com` is allowed in `next.config.ts`
+- Check internet connection
+
+### API errors
+- Verify API keys in `.env.local`
+- Check rate limits (500/day for VirusTotal)
+- Ensure keys are valid
+
+## License
+
+Proprietary - Sendmarc Internal Tool
+
+## Support
+
+For issues or questions, contact the Sendmarc development team.
+
+---
+
+**Built with ❤️ by Sendmarc**
