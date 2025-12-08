@@ -1,60 +1,113 @@
 # Sendmarc Phishing URL Checker
 
-A free tool to check URLs for phishing, malware, and security threats using multiple security engines.
+**Live Demo:** [https://phishing-checker-5y86g148o-tughan-caydavuls-projects.vercel.app](https://phishing-checker-5y86g148o-tughan-caydavuls-projects.vercel.app)
+
+A free, production-ready tool to check URLs and email content for phishing threats using VirusTotal and Google Safe Browsing.
+
+---
 
 ## Features
 
-- ✅ **VirusTotal Integration** - Scans URLs against 60+ security engines
-- ✅ **Google Safe Browsing** - Checks against Google's threat database
-- ✅ **SSL/TLS Validation** - Verifies HTTPS security
-- ✅ **Risk Scoring** - 0-100 risk score with threat level classification
-- ✅ **Sendmarc Branding** - Clean, professional UI matching Sendmarc style
-- ✅ **Free to Use** - 500 checks/day (VirusTotal limit)
+- **Single URL Analysis** - Check individual URLs for security threats
+- **Email Content Scanner** - Paste entire emails to automatically extract and analyze all links
+- **Multi-Engine Detection** - Powered by VirusTotal (60+ security engines) and Google Safe Browsing
+- **Risk Scoring** - 0-100 risk assessment with detailed threat breakdown
+- **Real-time Analysis** - Instant results with comprehensive security reports
+- **Rate Limited** - Built-in protection against abuse (10 requests/minute/IP)
 
-## Tech Stack
+---
 
-- **Next.js 16** - React framework with App Router
-- **TypeScript** - Type-safe code
-- **Tailwind CSS** - Utility-first styling
-- **VirusTotal API** - Malware/phishing detection
-- **Google Safe Browsing API** - Threat database
-- **Vercel** - Deployment platform
+## Technology Stack
+
+**Frontend**
+- Next.js 16 with App Router
+- TypeScript
+- Tailwind CSS
+- React 19
+
+**Backend**
+- Next.js API Routes (Serverless)
+- VirusTotal API v3
+- Google Safe Browsing API v4
+- Axios for HTTP requests
+
+**Infrastructure**
+- Vercel (Edge Functions)
+- Server-side API key management
+- In-memory rate limiting
+
+---
+
+## Prerequisites
+
+- Node.js 18 or higher
+- VirusTotal API key ([Get one here](https://www.virustotal.com/gui/my-apikey))
+- Google Safe Browsing API key ([Get one here](https://console.cloud.google.com/apis/credentials))
+
+---
 
 ## Setup
 
-### Prerequisites
+### 1. Clone the repository
 
-- Node.js 18+ installed
-- VirusTotal API key
-- Google Safe Browsing API key
+```bash
+git clone https://github.com/tughn/sendmarc-phishing-checker.git
+cd sendmarc-phishing-checker
+```
 
-### Installation
+### 2. Install dependencies
 
-1. Install dependencies:
 ```bash
 npm install
 ```
 
-2. Create `.env.local` file:
-```bash
-VIRUSTOTAL_API_KEY=your_virustotal_api_key
-NEXT_PUBLIC_GOOGLE_SAFE_BROWSING_API_KEY=your_google_api_key
+### 3. Configure environment variables
+
+Create a `.env.local` file in the root directory:
+
+```env
+VIRUSTOTAL_API_KEY=your_virustotal_api_key_here
+GOOGLE_SAFE_BROWSING_API_KEY=your_google_safe_browsing_api_key_here
 ```
 
-3. Run development server:
+### 4. Run development server
+
 ```bash
 npm run dev
 ```
 
-4. Open [http://localhost:3000](http://localhost:3000)
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-## API Endpoints
+### 5. Build for production
 
-### POST /api/check-url
+```bash
+npm run build
+npm start
+```
+
+---
+
+## Deployment
+
+### Deploy to Vercel
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/tughn/sendmarc-phishing-checker)
+
+1. Connect your GitHub repository to Vercel
+2. Add environment variables in Vercel dashboard:
+   - `VIRUSTOTAL_API_KEY`
+   - `GOOGLE_SAFE_BROWSING_API_KEY`
+3. Deploy
+
+---
+
+## API Reference
+
+### POST `/api/check-url`
 
 Check a URL for security threats.
 
-**Request:**
+**Request Body:**
 ```json
 {
   "url": "https://example.com"
@@ -91,128 +144,68 @@ Check a URL for security threats.
 }
 ```
 
-## Risk Scoring
+---
 
-| Risk Score | Level  | Color  |
-|------------|--------|--------|
-| 0-19       | SAFE   | Green  |
-| 20-39      | LOW    | Yellow |
-| 40-69      | MEDIUM | Orange |
-| 70-100     | HIGH   | Red    |
+## Security
 
-**Scoring Breakdown:**
-- VirusTotal malicious detections: up to 40 points
-- Google Safe Browsing threats: 40 points
-- No HTTPS: 20 points
+- All API keys are server-side only and never exposed to the client
+- Rate limiting prevents abuse (10 requests/minute per IP)
+- Input validation on all endpoints
+- HTTPS enforced in production
+- Environment variables excluded from version control
 
-## Deployment
+**Security Audit Score:** 9/10 - Production ready
 
-### Deploy to Vercel
+See [SECURITY.md](SECURITY.md) for detailed security documentation.
 
-1. Push to GitHub:
-```bash
-git init
-git add .
-git commit -m "Initial commit: Phishing URL Checker"
-git branch -M main
-git remote add origin <your-repo-url>
-git push -u origin main
-```
-
-2. Import to Vercel:
-   - Go to https://vercel.com/new
-   - Import your GitHub repository
-   - Add environment variables:
-     - `VIRUSTOTAL_API_KEY`
-     - `NEXT_PUBLIC_GOOGLE_SAFE_BROWSING_API_KEY`
-   - Deploy!
-
-## Usage Limits (Free Tier)
-
-- **VirusTotal**: 500 requests/day, 4 requests/minute
-- **Google Safe Browsing**: 10,000 requests/day
-- **Vercel**: Unlimited hosting
+---
 
 ## Project Structure
 
 ```
 phishing-checker/
 ├── app/
-│   ├── api/
-│   │   └── check-url/
-│   │       └── route.ts          # API endpoint
-│   ├── globals.css               # Sendmarc branding
-│   ├── layout.tsx                # Root layout
-│   └── page.tsx                  # Main UI
-├── public/                        # Static assets
-├── .env.local                     # API keys (not in git)
-├── .gitignore                     # Excludes .env files
-├── next.config.ts                 # Next.js config
-├── package.json                   # Dependencies
+│   ├── api/check-url/route.ts    # API endpoint with rate limiting
+│   ├── page.tsx                   # Main UI with dual input modes
+│   ├── layout.tsx                 # SEO metadata and structured data
+│   └── globals.css                # Sendmarc brand styling
+├── .env.local                     # Environment variables (not in Git)
+├── .env.example                   # Template for required variables
+├── DEPLOYMENT.md                  # Deployment guide
+├── SECURITY.md                    # Security audit report
+├── SEO_STRATEGY.md                # SEO optimization guide
 └── README.md                      # This file
 ```
 
-## Security
+---
 
-- ✅ API keys stored in `.env.local` (excluded from Git)
-- ✅ Server-side API calls (keys never exposed to client)
-- ✅ Input validation on all requests
-- ✅ CORS protection via Next.js
-- ✅ Rate limiting via API providers
+## Usage Limits
 
-## Development
-
-### Start development server:
-```bash
-npm run dev
-```
-
-### Build for production:
-```bash
-npm run build
-```
-
-### Run production build:
-```bash
-npm start
-```
-
-## Testing
-
-Test with these URLs:
-
-**Safe URLs:**
-- `https://google.com`
-- `https://sendmarc.com`
-
-**Known Malicious (for testing):**
-- `http://malware.wicar.org/data/eicar.com`
-- Check VirusTotal's recent submissions
-
-## Troubleshooting
-
-### "URL not found" on VirusTotal
-- The URL hasn't been scanned yet
-- The tool will automatically submit it for scanning
-- Check again in 2-3 minutes
-
-### Image not loading
-- Verify `help.sendmarc.com` is allowed in `next.config.ts`
-- Check internet connection
-
-### API errors
-- Verify API keys in `.env.local`
-- Check rate limits (500/day for VirusTotal)
-- Ensure keys are valid
-
-## License
-
-Proprietary - Sendmarc Internal Tool
-
-## Support
-
-For issues or questions, contact the Sendmarc development team.
+**Free Tier:**
+- VirusTotal: 500 requests/day
+- Google Safe Browsing: 10,000 requests/day
+- Vercel: Unlimited hosting
 
 ---
 
-**Built with ❤️ by Sendmarc**
+## Contributing
+
+This is a Sendmarc internal tool. For issues or suggestions, please contact the development team.
+
+---
+
+## License
+
+Proprietary - Sendmarc
+
+---
+
+## Support
+
+- **Documentation:** See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed setup instructions
+- **Security:** See [SECURITY.md](SECURITY.md) for security best practices
+- **SEO:** See [SEO_STRATEGY.md](SEO_STRATEGY.md) for ranking strategy
+
+---
+
+**Built by Sendmarc** - Email security made simple
