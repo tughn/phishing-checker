@@ -2,7 +2,7 @@
 
 **Live Demo:** [https://phishing-checker-zeta.vercel.app](https://phishing-checker-zeta.vercel.app)
 
-A free, production-ready tool to check URLs and email content for phishing threats using VirusTotal and Google Safe Browsing.
+A free, demo tool to check URLs and email content for phishing threats using VirusTotal and Google Safe Browsing.
 
 ---
 
