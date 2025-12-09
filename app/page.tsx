@@ -62,7 +62,17 @@ export default function Home() {
   const handleCheckUrl = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!turnstileToken) {
+    // Try to get token from Turnstile API if not in state
+    let token = turnstileToken;
+    if (!token && typeof window !== 'undefined' && (window as any).turnstile) {
+      const widgets = document.querySelectorAll('.cf-turnstile');
+      if (widgets.length > 0) {
+        token = (window as any).turnstile.getResponse(widgets[0]);
+        console.log('Got token from Turnstile API:', token);
+      }
+    }
+
+    if (!token) {
       setError('Please complete the security verification');
       return;
     }
@@ -76,7 +86,7 @@ export default function Home() {
       const response = await fetch('/api/check-url', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url, turnstileToken }),
+        body: JSON.stringify({ url, turnstileToken: token }),
       });
 
       const data = await response.json();
@@ -100,7 +110,17 @@ export default function Home() {
   const handleCheckEmail = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!turnstileToken) {
+    // Try to get token from Turnstile API if not in state
+    let token = turnstileToken;
+    if (!token && typeof window !== 'undefined' && (window as any).turnstile) {
+      const widgets = document.querySelectorAll('.cf-turnstile');
+      if (widgets.length > 1) {
+        token = (window as any).turnstile.getResponse(widgets[1]);
+        console.log('Got token from Turnstile API:', token);
+      }
+    }
+
+    if (!token) {
       setError('Please complete the security verification');
       return;
     }
@@ -125,7 +145,7 @@ export default function Home() {
           const response = await fetch('/api/check-url', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ url, turnstileToken }),
+            body: JSON.stringify({ url, turnstileToken: token }),
           });
 
           const data = await response.json();
@@ -246,7 +266,7 @@ export default function Home() {
               <div key={`turnstile-url-${turnstileResetKey}`} className="cf-turnstile" data-sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} data-callback="onTurnstileSuccess"></div>
               <button
                 type="submit"
-                disabled={loading || !turnstileToken}
+                disabled={loading}
                 className="w-full py-3 rounded-lg font-medium text-white transition disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{ backgroundColor: '#0073EA' }}
                 onMouseOver={(e) => !loading && turnstileToken && (e.currentTarget.style.backgroundColor = '#005bb5')}
@@ -273,7 +293,7 @@ export default function Home() {
               <div key={`turnstile-email-${turnstileResetKey}`} className="cf-turnstile" data-sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} data-callback="onTurnstileSuccess"></div>
               <button
                 type="submit"
-                disabled={loading || !turnstileToken}
+                disabled={loading}
                 className="w-full py-3 rounded-lg font-medium text-white transition disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{ backgroundColor: '#0073EA' }}
                 onMouseOver={(e) => !loading && turnstileToken && (e.currentTarget.style.backgroundColor = '#005bb5')}
