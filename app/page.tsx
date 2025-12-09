@@ -96,14 +96,12 @@ export default function Home() {
 
       setResult(data);
 
-      // Use Turnstile reset API instead of React key change
+      // Reset the token and trigger Turnstile to re-verify
+      setTurnstileToken('');
       if (typeof window !== 'undefined' && (window as any).turnstile) {
         const widgets = document.querySelectorAll('.cf-turnstile');
         if (widgets.length > 0) {
-          const widgetId = widgets[0].getAttribute('data-widget-id');
-          if (widgetId) {
-            (window as any).turnstile.reset(widgetId);
-          }
+          (window as any).turnstile.reset(widgets[0]);
         }
       }
     } catch (err: any) {
@@ -175,14 +173,12 @@ export default function Home() {
         cleanCount: clean,
       });
 
-      // Use Turnstile reset API instead of React key change
+      // Reset the token and trigger Turnstile to re-verify
+      setTurnstileToken('');
       if (typeof window !== 'undefined' && (window as any).turnstile) {
         const widgets = document.querySelectorAll('.cf-turnstile');
         if (widgets.length > 1) {
-          const widgetId = widgets[1].getAttribute('data-widget-id');
-          if (widgetId) {
-            (window as any).turnstile.reset(widgetId);
-          }
+          (window as any).turnstile.reset(widgets[1]);
         }
       }
     } catch (err: any) {
