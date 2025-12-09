@@ -248,27 +248,64 @@ export default function Home() {
           )}
         </div>
 
+        {/* Loading Skeleton */}
+        {loading && (
+          <div className="space-y-6 animate-pulse">
+            <div className="rounded-lg border border-gray-200 bg-white p-8">
+              <div className="text-center space-y-4">
+                <div className="h-16 w-48 bg-gray-200 rounded-lg mx-auto"></div>
+                <div className="h-6 w-32 bg-gray-200 rounded mx-auto"></div>
+                <div className="h-4 w-64 bg-gray-200 rounded mx-auto"></div>
+              </div>
+            </div>
+            <div className="rounded-lg border border-gray-200 bg-white p-6">
+              <div className="h-6 w-40 bg-gray-200 rounded mb-4"></div>
+              <div className="grid grid-cols-4 gap-3">
+                {[1,2,3,4].map(i => (
+                  <div key={i} className="h-20 bg-gray-100 rounded-lg"></div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Single URL Result */}
-        {result && (
+        {result && !loading && (
           <div className="space-y-6">
-            <div className={`rounded-lg border p-6 ${
+            <div className={`rounded-lg border-2 p-10 transition-all ${
               result.verdict === 'SUSPICIOUS'
-                ? 'bg-red-50 border-red-200'
-                : 'bg-green-50 border-green-200'
+                ? 'bg-red-50 border-red-300'
+                : 'bg-green-50 border-green-300'
             }`}>
               <div className="text-center">
-                <div className={`text-4xl font-bold mb-3 ${
+                <div className={`inline-flex items-center justify-center w-20 h-20 rounded-full mb-4 ${
+                  result.verdict === 'SUSPICIOUS' ? 'bg-red-100' : 'bg-green-100'
+                }`}>
+                  <svg className={`w-10 h-10 ${result.verdict === 'SUSPICIOUS' ? 'text-red-600' : 'text-green-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    {result.verdict === 'SUSPICIOUS' ? (
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    ) : (
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    )}
+                  </svg>
+                </div>
+                <div className={`text-5xl font-bold mb-3 tracking-tight ${
                   result.verdict === 'SUSPICIOUS' ? 'text-red-600' : 'text-green-600'
                 }`}>
-                  {result.verdict === 'SUSPICIOUS' ? '🔴 SUSPICIOUS' : '🟢 CLEAN'}
+                  {result.verdict === 'SUSPICIOUS' ? 'SUSPICIOUS' : 'CLEAN'}
                 </div>
-                <div className="text-base font-medium text-gray-700 mb-2">
-                  {result.verdict === 'SUSPICIOUS' ? 'Avoid this link' : 'No threats detected'}
+                <div className="text-lg font-medium text-gray-700 mb-2">
+                  {result.verdict === 'SUSPICIOUS' ? 'Do not click this link' : 'Safe to proceed'}
                 </div>
                 {result.suspicionReasons && result.suspicionReasons.length > 0 && (
-                  <div className="text-sm text-gray-600 space-y-1 mt-3">
+                  <div className="text-sm text-gray-600 space-y-1 mt-4 max-w-lg mx-auto">
                     {result.suspicionReasons.map((reason, idx) => (
-                      <div key={idx}>• {reason}</div>
+                      <div key={idx} className="flex items-center justify-center gap-2">
+                        <svg className="w-4 h-4 text-gray-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        </svg>
+                        <span>{reason}</span>
+                      </div>
                     ))}
                   </div>
                 )}
@@ -276,12 +313,17 @@ export default function Home() {
             </div>
 
             <div className="bg-white rounded-lg border border-gray-200 p-6">
-              <h3 className="text-lg font-semibold mb-4 text-gray-900">Security Analysis</h3>
+              <h3 className="text-lg font-semibold mb-5 text-gray-900">Security Analysis</h3>
 
-              <div className="space-y-5">
+              <div className="space-y-6">
                 {result.checks.virustotal && !result.checks.virustotal.error && !result.checks.virustotal.status && (
                   <div>
-                    <h4 className="font-medium mb-3 text-gray-700">VirusTotal</h4>
+                    <div className="flex items-center gap-2 mb-3">
+                      <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                      </svg>
+                      <h4 className="font-semibold text-gray-900">VirusTotal Scan</h4>
+                    </div>
                     <div className="grid grid-cols-4 gap-3">
                       <div className="bg-red-50 p-3 rounded-lg text-center">
                         <div className="text-xl font-bold text-red-600">
@@ -341,18 +383,28 @@ export default function Home() {
 
                 {result.checks.safeBrowsing && !result.checks.safeBrowsing.error && (
                   <div>
-                    <h4 className="font-medium text-gray-700">Google Safe Browsing</h4>
-                    <p className={`text-sm mt-2 ${result.checks.safeBrowsing.safe ? 'text-green-600' : 'text-red-600'}`}>
-                      {result.checks.safeBrowsing.safe ? '✓ No threats detected' : '⚠ Threats detected'}
+                    <div className="flex items-center gap-2 mb-2">
+                      <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+                      </svg>
+                      <h4 className="font-semibold text-gray-900">Google Safe Browsing</h4>
+                    </div>
+                    <p className={`text-sm ${result.checks.safeBrowsing.safe ? 'text-green-600' : 'text-red-600'}`}>
+                      {result.checks.safeBrowsing.safe ? 'No threats detected' : 'Threats detected'}
                     </p>
                   </div>
                 )}
 
                 {result.checks.ssl && (
                   <div>
-                    <h4 className="font-medium text-gray-700">Security</h4>
-                    <p className={`text-sm mt-2 ${result.checks.ssl.secure ? 'text-green-600' : 'text-orange-600'}`}>
-                      {result.checks.ssl.secure ? '✓ HTTPS' : '⚠ No HTTPS'}
+                    <div className="flex items-center gap-2 mb-2">
+                      <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                      </svg>
+                      <h4 className="font-semibold text-gray-900">Connection Security</h4>
+                    </div>
+                    <p className={`text-sm ${result.checks.ssl.secure ? 'text-green-600' : 'text-orange-600'}`}>
+                      {result.checks.ssl.secure ? 'Secure HTTPS connection' : 'Insecure HTTP connection'}
                     </p>
                   </div>
                 )}
@@ -366,24 +418,35 @@ export default function Home() {
         )}
 
         {/* Multi URL Results */}
-        {multiResult && (
+        {multiResult && !loading && (
           <div className="space-y-6">
             {/* Overall Email Risk */}
-            <div className={`rounded-lg border p-6 ${
+            <div className={`rounded-lg border-2 p-10 transition-all ${
               multiResult.suspiciousCount > 0
-                ? 'bg-red-50 border-red-200'
-                : 'bg-green-50 border-green-200'
+                ? 'bg-red-50 border-red-300'
+                : 'bg-green-50 border-green-300'
             }`}>
               <div className="text-center">
-                <div className={`text-3xl font-bold mb-2 ${
+                <div className={`inline-flex items-center justify-center w-20 h-20 rounded-full mb-4 ${
+                  multiResult.suspiciousCount > 0 ? 'bg-red-100' : 'bg-green-100'
+                }`}>
+                  <svg className={`w-10 h-10 ${multiResult.suspiciousCount > 0 ? 'text-red-600' : 'text-green-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    {multiResult.suspiciousCount > 0 ? (
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    ) : (
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    )}
+                  </svg>
+                </div>
+                <div className={`text-5xl font-bold mb-3 tracking-tight ${
                   multiResult.suspiciousCount > 0 ? 'text-red-600' : 'text-green-600'
                 }`}>
-                  {multiResult.suspiciousCount > 0 ? '🔴 SUSPICIOUS EMAIL' : '🟢 SAFE EMAIL'}
+                  {multiResult.suspiciousCount > 0 ? 'SUSPICIOUS' : 'CLEAN'}
                 </div>
-                <div className="text-sm text-gray-600">
+                <div className="text-lg font-medium text-gray-700 mb-2">
                   {multiResult.suspiciousCount > 0
-                    ? `${multiResult.suspiciousCount} suspicious link${multiResult.suspiciousCount > 1 ? 's' : ''} detected`
-                    : 'All links are clean'}
+                    ? `${multiResult.suspiciousCount} dangerous link${multiResult.suspiciousCount > 1 ? 's' : ''} found`
+                    : 'All links are safe'}
                 </div>
               </div>
             </div>
