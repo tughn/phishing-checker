@@ -118,6 +118,14 @@ export default function Home() {
         }
 
         setResult(data);
+
+        // Scroll to results smoothly
+        setTimeout(() => {
+          document.getElementById('results-section')?.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
+        }, 100);
       } else {
         // Multiple URLs, show multi result
         const results: CheckResult[] = [];
@@ -151,6 +159,14 @@ export default function Home() {
           suspiciousCount: suspicious,
           cleanCount: clean,
         });
+
+        // Scroll to results smoothly
+        setTimeout(() => {
+          document.getElementById('results-section')?.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
+        }, 100);
       }
     } catch (err: any) {
       setError(err.message);
