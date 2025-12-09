@@ -217,49 +217,45 @@ export async function POST(request: NextRequest) {
       };
     }
 
-    // Calculate Risk Score
-    let riskScore = 0;
-    let maxScore = 100;
+    // Binary Classification (Suspicious/Clean)
+    // If ANY reputable engine flags it, it's suspicious
+    const premiumEngines = [
+      'Kaspersky', 'Sophos', 'Fortinet', 'Avira', 'ESET',
+      'BitDefender', 'G-Data', 'Webroot', 'Antiy-AVL', 'AlphaSOC',
+      'Emsisoft', 'Trustwave', 'Lionic', 'Forcepoint ThreatSeeker'
+    ];
 
-    // VirusTotal scoring (up to 70 points)
-    if (results.checks.virustotal?.malicious) {
-      // 1-2 engines: 20 points (likely false positive)
-      // 3-4 engines: 40 points (suspicious)
-      // 5-9 engines: 60 points (high risk)
-      // 10+ engines: 70 points (critical threat)
-      if (results.checks.virustotal.malicious >= 10) {
-        riskScore += 70;
-      } else if (results.checks.virustotal.malicious >= 5) {
-        riskScore += 60;
-      } else if (results.checks.virustotal.malicious >= 3) {
-        riskScore += 40;
-      } else {
-        riskScore += results.checks.virustotal.malicious * 10;
+    let isSuspicious = false;
+    let suspicionReasons: string[] = [];
+
+    // Check if Google Safe Browsing flagged it
+    if (results.checks.safeBrowsing?.threats?.length > 0) {
+      isSuspicious = true;
+      suspicionReasons.push('Google Safe Browsing detected threats');
+    }
+
+    // Check if any premium engine flagged it as malicious
+    if (results.checks.virustotal?.detections) {
+      const premiumDetections = results.checks.virustotal.detections.filter(
+        (d: any) => d.category === 'malicious' && premiumEngines.includes(d.engine)
+      );
+      if (premiumDetections.length > 0) {
+        isSuspicious = true;
+        suspicionReasons.push(`${premiumDetections.length} trusted security engine${premiumDetections.length > 1 ? 's' : ''} flagged this`);
       }
     }
 
-    // Suspicious flags (up to 10 points)
-    if (results.checks.virustotal?.suspicious) {
-      riskScore += Math.min(results.checks.virustotal.suspicious * 5, 10);
+    // Check if multiple engines flagged it (even if not premium)
+    if (results.checks.virustotal?.malicious >= 3) {
+      isSuspicious = true;
+      if (!suspicionReasons.some(r => r.includes('security engine'))) {
+        suspicionReasons.push(`${results.checks.virustotal.malicious} security engines flagged this`);
+      }
     }
 
-    // Safe Browsing scoring (20 points)
-    if (results.checks.safeBrowsing?.threats?.length > 0) {
-      riskScore += 20;
-    }
-
-    // SSL scoring (10 points)
-    if (!results.checks.ssl?.secure) {
-      riskScore += 10;
-    }
-
-    results.riskScore = Math.min(riskScore, maxScore);
-    results.riskLevel =
-      riskScore >= 90 ? 'DANGER' :
-      riskScore >= 70 ? 'HIGH' :
-      riskScore >= 40 ? 'MEDIUM' :
-      riskScore >= 20 ? 'LOW' :
-      'SAFE';
+    results.isSuspicious = isSuspicious;
+    results.suspicionReasons = suspicionReasons;
+    results.verdict = isSuspicious ? 'SUSPICIOUS' : 'CLEAN';
 
     return NextResponse.json(results);
 

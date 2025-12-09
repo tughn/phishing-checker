@@ -6,8 +6,9 @@ import Image from 'next/image';
 interface CheckResult {
   url: string;
   timestamp: string;
-  riskScore: number;
-  riskLevel: string;
+  verdict: 'SUSPICIOUS' | 'CLEAN';
+  isSuspicious: boolean;
+  suspicionReasons: string[];
   checks: {
     virustotal?: any;
     safeBrowsing?: any;
@@ -20,11 +21,8 @@ interface MultiUrlResult {
   urls: string[];
   results: CheckResult[];
   totalUrls: number;
-  dangerRiskCount: number;
-  highRiskCount: number;
-  mediumRiskCount: number;
-  lowRiskCount: number;
-  safeCount: number;
+  suspiciousCount: number;
+  cleanCount: number;
 }
 
 export default function Home() {
@@ -87,7 +85,7 @@ export default function Home() {
       }
 
       const results: CheckResult[] = [];
-      let dangerRisk = 0, highRisk = 0, mediumRisk = 0, lowRisk = 0, safe = 0;
+      let suspicious = 0, clean = 0;
 
       for (const url of urls) {
         try {
@@ -102,11 +100,8 @@ export default function Home() {
           if (response.ok) {
             results.push(data);
 
-            if (data.riskLevel === 'DANGER') dangerRisk++;
-            else if (data.riskLevel === 'HIGH') highRisk++;
-            else if (data.riskLevel === 'MEDIUM') mediumRisk++;
-            else if (data.riskLevel === 'LOW') lowRisk++;
-            else safe++;
+            if (data.verdict === 'SUSPICIOUS') suspicious++;
+            else clean++;
           }
         } catch (err) {
           console.error(`Failed to check ${url}:`, err);
@@ -117,11 +112,8 @@ export default function Home() {
         urls,
         results,
         totalUrls: urls.length,
-        dangerRiskCount: dangerRisk,
-        highRiskCount: highRisk,
-        mediumRiskCount: mediumRisk,
-        lowRiskCount: lowRisk,
-        safeCount: safe,
+        suspiciousCount: suspicious,
+        cleanCount: clean,
       });
     } catch (err: any) {
       setError(err.message);
@@ -130,27 +122,6 @@ export default function Home() {
     }
   };
 
-  const getRiskColor = (level: string) => {
-    switch (level) {
-      case 'DANGER': return 'text-red-700 font-bold';
-      case 'HIGH': return 'text-red-600';
-      case 'MEDIUM': return 'text-orange-500';
-      case 'LOW': return 'text-yellow-600';
-      case 'SAFE': return 'text-green-600';
-      default: return 'text-gray-600';
-    }
-  };
-
-  const getRiskBg = (level: string) => {
-    switch (level) {
-      case 'DANGER': return 'bg-red-100 border-red-300 shadow-lg';
-      case 'HIGH': return 'bg-red-50 border-red-200';
-      case 'MEDIUM': return 'bg-orange-50 border-orange-200';
-      case 'LOW': return 'bg-yellow-50 border-yellow-200';
-      case 'SAFE': return 'bg-green-50 border-green-200';
-      default: return 'bg-gray-50 border-gray-200';
-    }
-  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -280,26 +251,27 @@ export default function Home() {
         {/* Single URL Result */}
         {result && (
           <div className="space-y-6">
-            <div className={`rounded-lg border p-6 ${getRiskBg(result.riskLevel)}`}>
+            <div className={`rounded-lg border p-6 ${
+              result.verdict === 'SUSPICIOUS'
+                ? 'bg-red-50 border-red-200'
+                : 'bg-green-50 border-green-200'
+            }`}>
               <div className="text-center">
-                <div className="text-5xl font-bold mb-2" style={{ color: '#0073EA' }}>
-                  {result.riskScore}
+                <div className={`text-4xl font-bold mb-3 ${
+                  result.verdict === 'SUSPICIOUS' ? 'text-red-600' : 'text-green-600'
+                }`}>
+                  {result.verdict === 'SUSPICIOUS' ? '🔴 SUSPICIOUS' : '🟢 CLEAN'}
                 </div>
-                <div className={`text-xl font-semibold mb-2 ${getRiskColor(result.riskLevel)}`}>
-                  {result.riskLevel}
+                <div className="text-base font-medium text-gray-700 mb-2">
+                  {result.verdict === 'SUSPICIOUS' ? 'Avoid this link' : 'No threats detected'}
                 </div>
-                <div className="text-sm text-gray-600 space-y-1">
-                  {result.checks.virustotal?.malicious > 0 && (
-                    <div>{result.checks.virustotal.malicious} security engines flagged this</div>
-                  )}
-                  {result.checks.safeBrowsing?.safe === false && (
-                    <div>Google detected phishing threat</div>
-                  )}
-                  {!result.checks.ssl?.secure && (
-                    <div>Not using secure HTTPS</div>
-                  )}
-                  {result.riskScore === 0 && <div>No threats detected</div>}
-                </div>
+                {result.suspicionReasons && result.suspicionReasons.length > 0 && (
+                  <div className="text-sm text-gray-600 space-y-1 mt-3">
+                    {result.suspicionReasons.map((reason, idx) => (
+                      <div key={idx}>• {reason}</div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
 
@@ -398,32 +370,20 @@ export default function Home() {
           <div className="space-y-6">
             {/* Overall Email Risk */}
             <div className={`rounded-lg border p-6 ${
-              multiResult.dangerRiskCount > 0 ? 'bg-red-100 border-red-300 shadow-lg' :
-              multiResult.highRiskCount > 0 ? 'bg-red-50 border-red-200' :
-              multiResult.mediumRiskCount > 0 ? 'bg-orange-50 border-orange-200' :
-              multiResult.lowRiskCount > 0 ? 'bg-yellow-50 border-yellow-200' :
-              'bg-green-50 border-green-200'
+              multiResult.suspiciousCount > 0
+                ? 'bg-red-50 border-red-200'
+                : 'bg-green-50 border-green-200'
             }`}>
               <div className="text-center">
-                <div className={`text-2xl font-bold mb-2 ${
-                  multiResult.dangerRiskCount > 0 ? 'text-red-700' :
-                  multiResult.highRiskCount > 0 ? 'text-red-600' :
-                  multiResult.mediumRiskCount > 0 ? 'text-orange-600' :
-                  multiResult.lowRiskCount > 0 ? 'text-yellow-600' :
-                  'text-green-600'
+                <div className={`text-3xl font-bold mb-2 ${
+                  multiResult.suspiciousCount > 0 ? 'text-red-600' : 'text-green-600'
                 }`}>
-                  {multiResult.dangerRiskCount > 0 ? 'CRITICAL DANGER - MALWARE DETECTED' :
-                   multiResult.highRiskCount > 0 ? 'HIGH RISK EMAIL' :
-                   multiResult.mediumRiskCount > 0 ? 'MEDIUM RISK EMAIL' :
-                   multiResult.lowRiskCount > 0 ? 'LOW RISK EMAIL' :
-                   'SAFE EMAIL'}
+                  {multiResult.suspiciousCount > 0 ? '🔴 SUSPICIOUS EMAIL' : '🟢 SAFE EMAIL'}
                 </div>
                 <div className="text-sm text-gray-600">
-                  {multiResult.dangerRiskCount > 0 && `${multiResult.dangerRiskCount} critical threat${multiResult.dangerRiskCount > 1 ? 's' : ''} detected`}
-                  {multiResult.highRiskCount > 0 && !multiResult.dangerRiskCount && `${multiResult.highRiskCount} high risk link${multiResult.highRiskCount > 1 ? 's' : ''} detected`}
-                  {multiResult.mediumRiskCount > 0 && !multiResult.dangerRiskCount && !multiResult.highRiskCount && `${multiResult.mediumRiskCount} medium risk link${multiResult.mediumRiskCount > 1 ? 's' : ''} detected`}
-                  {multiResult.lowRiskCount > 0 && !multiResult.dangerRiskCount && !multiResult.highRiskCount && !multiResult.mediumRiskCount && `${multiResult.lowRiskCount} low risk link${multiResult.lowRiskCount > 1 ? 's' : ''} detected`}
-                  {multiResult.safeCount === multiResult.totalUrls && 'All links are safe'}
+                  {multiResult.suspiciousCount > 0
+                    ? `${multiResult.suspiciousCount} suspicious link${multiResult.suspiciousCount > 1 ? 's' : ''} detected`
+                    : 'All links are clean'}
                 </div>
               </div>
             </div>
@@ -431,41 +391,24 @@ export default function Home() {
             <div className="bg-white rounded-lg border border-gray-200 p-6">
               <h3 className="text-lg font-semibold mb-4 text-gray-900">Summary</h3>
 
-              <div className="grid grid-cols-6 gap-3">
+              <div className="grid grid-cols-3 gap-4">
                 <div className="bg-gray-50 p-4 rounded-lg text-center">
-                  <div className="text-2xl font-bold text-gray-900">{multiResult.totalUrls}</div>
-                  <div className="text-xs text-gray-600 mt-1">Total</div>
-                </div>
-                <div className="bg-red-100 p-4 rounded-lg text-center">
-                  <div className="text-2xl font-bold text-red-700">{multiResult.dangerRiskCount}</div>
-                  <div className="text-xs text-gray-600 mt-1">Danger</div>
+                  <div className="text-3xl font-bold text-gray-900">{multiResult.totalUrls}</div>
+                  <div className="text-sm text-gray-600 mt-1">Total Links</div>
                 </div>
                 <div className="bg-red-50 p-4 rounded-lg text-center">
-                  <div className="text-2xl font-bold text-red-600">{multiResult.highRiskCount}</div>
-                  <div className="text-xs text-gray-600 mt-1">High</div>
-                </div>
-                <div className="bg-orange-50 p-4 rounded-lg text-center">
-                  <div className="text-2xl font-bold text-orange-600">{multiResult.mediumRiskCount}</div>
-                  <div className="text-xs text-gray-600 mt-1">Medium</div>
-                </div>
-                <div className="bg-yellow-50 p-4 rounded-lg text-center">
-                  <div className="text-2xl font-bold text-yellow-600">{multiResult.lowRiskCount}</div>
-                  <div className="text-xs text-gray-600 mt-1">Low</div>
+                  <div className="text-3xl font-bold text-red-600">{multiResult.suspiciousCount}</div>
+                  <div className="text-sm text-gray-600 mt-1">Suspicious</div>
                 </div>
                 <div className="bg-green-50 p-4 rounded-lg text-center">
-                  <div className="text-2xl font-bold text-green-600">{multiResult.safeCount}</div>
-                  <div className="text-xs text-gray-600 mt-1">Safe</div>
+                  <div className="text-3xl font-bold text-green-600">{multiResult.cleanCount}</div>
+                  <div className="text-sm text-gray-600 mt-1">Clean</div>
                 </div>
               </div>
 
-              {multiResult.dangerRiskCount > 0 && (
-                <div className="bg-red-100 border border-red-300 rounded-lg p-3 mt-4">
-                  <p className="text-red-700 text-sm font-bold">⚠ CRITICAL: Malware or phishing threats detected</p>
-                </div>
-              )}
-              {multiResult.highRiskCount > 0 && multiResult.dangerRiskCount === 0 && (
+              {multiResult.suspiciousCount > 0 && (
                 <div className="bg-red-50 border border-red-200 rounded-lg p-3 mt-4">
-                  <p className="text-red-600 text-sm font-medium">⚠ High risk URLs detected</p>
+                  <p className="text-red-600 text-sm font-medium">⚠️ Do not click on suspicious links</p>
                 </div>
               )}
             </div>
@@ -473,22 +416,34 @@ export default function Home() {
             <div className="space-y-3">
               <h3 className="text-lg font-semibold text-gray-900">URL Results</h3>
               {multiResult.results.map((res, idx) => (
-                <div key={idx} className={`rounded-lg border p-4 ${getRiskBg(res.riskLevel)}`}>
+                <div key={idx} className={`rounded-lg border p-4 ${
+                  res.verdict === 'SUSPICIOUS'
+                    ? 'bg-red-50 border-red-200'
+                    : 'bg-green-50 border-green-200'
+                }`}>
                   <div className="flex items-center justify-between gap-4">
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-mono break-all text-gray-700 mb-1">{res.url}</p>
-                      <div className="flex items-center gap-3 text-xs">
-                        <span className={`font-medium ${getRiskColor(res.riskLevel)}`}>
-                          {res.riskLevel}
+                      <p className="text-sm font-mono break-all text-gray-700 mb-2">{res.url}</p>
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className={`px-3 py-1 rounded-full text-xs font-bold ${
+                          res.verdict === 'SUSPICIOUS'
+                            ? 'bg-red-100 text-red-700'
+                            : 'bg-green-100 text-green-700'
+                        }`}>
+                          {res.verdict === 'SUSPICIOUS' ? '🔴 SUSPICIOUS' : '🟢 CLEAN'}
                         </span>
-                        {res.checks.virustotal?.malicious > 0 && (
-                          <span className="text-red-600">{res.checks.virustotal.malicious} flagged</span>
-                        )}
-                        {!res.checks.ssl?.secure && <span className="text-orange-600">No HTTPS</span>}
                       </div>
 
+                      {res.suspicionReasons && res.suspicionReasons.length > 0 && (
+                        <div className="text-xs text-gray-600 space-y-1 mb-2">
+                          {res.suspicionReasons.map((reason, reasonIdx) => (
+                            <div key={reasonIdx}>• {reason}</div>
+                          ))}
+                        </div>
+                      )}
+
                       {res.checks.virustotal?.detections && res.checks.virustotal.detections.length > 0 && (
-                        <div className="mt-3">
+                        <div className="mt-2">
                           <button
                             onClick={() => setExpandedUrlIndex(expandedUrlIndex === idx ? null : idx)}
                             className="text-xs text-blue-600 hover:text-blue-800 font-medium"
@@ -514,9 +469,6 @@ export default function Home() {
                           )}
                         </div>
                       )}
-                    </div>
-                    <div className="text-2xl font-bold" style={{ color: '#0073EA' }}>
-                      {res.riskScore}
                     </div>
                   </div>
                 </div>
