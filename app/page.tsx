@@ -95,15 +95,6 @@ export default function Home() {
       }
 
       setResult(data);
-
-      // Reset the token and trigger Turnstile to re-verify
-      setTurnstileToken('');
-      if (typeof window !== 'undefined' && (window as any).turnstile) {
-        const widgets = document.querySelectorAll('.cf-turnstile');
-        if (widgets.length > 0) {
-          (window as any).turnstile.reset(widgets[0]);
-        }
-      }
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -172,15 +163,6 @@ export default function Home() {
         suspiciousCount: suspicious,
         cleanCount: clean,
       });
-
-      // Reset the token and trigger Turnstile to re-verify
-      setTurnstileToken('');
-      if (typeof window !== 'undefined' && (window as any).turnstile) {
-        const widgets = document.querySelectorAll('.cf-turnstile');
-        if (widgets.length > 1) {
-          (window as any).turnstile.reset(widgets[1]);
-        }
-      }
     } catch (err: any) {
       setError(err.message);
     } finally {
