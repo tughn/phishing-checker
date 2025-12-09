@@ -26,11 +26,9 @@ interface MultiUrlResult {
 }
 
 export default function Home() {
-  const [mode, setMode] = useState<'url' | 'email'>('url');
   const [showDetections, setShowDetections] = useState<boolean>(false);
   const [expandedUrlIndex, setExpandedUrlIndex] = useState<number | null>(null);
-  const [url, setUrl] = useState('');
-  const [emailContent, setEmailContent] = useState('');
+  const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<CheckResult | null>(null);
   const [multiResult, setMultiResult] = useState<MultiUrlResult | null>(null);
@@ -58,7 +56,17 @@ export default function Home() {
     return matches ? [...new Set(matches)] : [];
   };
 
-  const handleCheckUrl = async (e: React.FormEvent) => {
+  const isValidUrl = (urlString: string): boolean => {
+    try {
+      const url = new URL(urlString.startsWith('http') ? urlString : `https://${urlString}`);
+      // Check if it has a proper domain (at least domain.tld format)
+      return url.hostname.includes('.') && url.hostname.length > 3;
+    } catch {
+      return false;
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     // Try to get token from Turnstile API if not in state
@@ -82,87 +90,68 @@ export default function Home() {
     setMultiResult(null);
 
     try {
-      const response = await fetch('/api/check-url', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url, turnstileToken: token }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to check URL');
-      }
-
-      setResult(data);
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleCheckEmail = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    // Try to get token from Turnstile API if not in state
-    let token = turnstileToken;
-    if (!token && typeof window !== 'undefined' && (window as any).turnstile) {
-      const widgets = document.querySelectorAll('.cf-turnstile');
-      if (widgets.length > 1) {
-        token = (window as any).turnstile.getResponse(widgets[1]);
-        console.log('Got token from Turnstile API:', token);
-      }
-    }
-
-    if (!token) {
-      setError('Please complete the security verification');
-      return;
-    }
-
-    setLoading(true);
-    setError('');
-    setResult(null);
-    setMultiResult(null);
-
-    try {
-      const urls = extractUrls(emailContent);
+      // Extract all URLs from input
+      const urls = extractUrls(input.trim());
 
       if (urls.length === 0) {
-        throw new Error('No URLs found in the email content');
+        throw new Error('Please enter at least one valid URL');
       }
 
-      const results: CheckResult[] = [];
-      let suspicious = 0, clean = 0;
+      // Validate all URLs
+      const invalidUrls = urls.filter(url => !isValidUrl(url));
+      if (invalidUrls.length > 0) {
+        throw new Error(`Invalid URL format: ${invalidUrls[0]}`);
+      }
 
-      for (const url of urls) {
-        try {
-          const response = await fetch('/api/check-url', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ url, turnstileToken: token }),
-          });
+      // If single URL, show single result
+      if (urls.length === 1) {
+        const response = await fetch('/api/check-url', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: urls[0], turnstileToken: token }),
+        });
 
-          const data = await response.json();
+        const data = await response.json();
 
-          if (response.ok) {
-            results.push(data);
-
-            if (data.verdict === 'SUSPICIOUS') suspicious++;
-            else clean++;
-          }
-        } catch (err) {
-          console.error(`Failed to check ${url}:`, err);
+        if (!response.ok) {
+          throw new Error(data.error || 'Failed to check URL');
         }
-      }
 
-      setMultiResult({
-        urls,
-        results,
-        totalUrls: urls.length,
-        suspiciousCount: suspicious,
-        cleanCount: clean,
-      });
+        setResult(data);
+      } else {
+        // Multiple URLs, show multi result
+        const results: CheckResult[] = [];
+        let suspicious = 0, clean = 0;
+
+        for (const url of urls) {
+          try {
+            const response = await fetch('/api/check-url', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ url, turnstileToken: token }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+              results.push(data);
+
+              if (data.verdict === 'SUSPICIOUS') suspicious++;
+              else clean++;
+            }
+          } catch (err) {
+            console.error(`Failed to check ${url}:`, err);
+          }
+        }
+
+        setMultiResult({
+          urls,
+          results,
+          totalUrls: urls.length,
+          suspiciousCount: suspicious,
+          cleanCount: clean,
+        });
+      }
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -200,96 +189,34 @@ export default function Home() {
           </p>
         </div>
 
-        {/* Tabs */}
-        <div className="flex gap-1 mb-6">
-          <button
-            onClick={() => {
-              setMode('url');
-              setError('');
-              setResult(null);
-              setMultiResult(null);
-            }}
-            className={`px-5 py-2.5 font-medium rounded-t-lg transition ${
-              mode === 'url'
-                ? 'bg-white border-t-2 border-x border-gray-200 text-blue-600'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-            }`}
-            style={mode === 'url' ? { borderTopColor: '#0073EA', color: '#0073EA' } : {}}
-          >
-            Single URL
-          </button>
-          <button
-            onClick={() => {
-              setMode('email');
-              setError('');
-              setResult(null);
-              setMultiResult(null);
-            }}
-            className={`px-5 py-2.5 font-medium rounded-t-lg transition ${
-              mode === 'email'
-                ? 'bg-white border-t-2 border-x border-gray-200 text-blue-600'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-            }`}
-            style={mode === 'email' ? { borderTopColor: '#0073EA', color: '#0073EA' } : {}}
-          >
-            Email Content
-          </button>
-        </div>
-
         {/* Input Form */}
         <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm mb-8">
-          {mode === 'url' ? (
-            <form onSubmit={handleCheckUrl} className="space-y-4">
-              <input
-                type="text"
-                value={url}
-                onChange={(e) => setUrl(e.target.value)}
-                placeholder="https://example.com"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                style={{ '--tw-ring-color': '#0073EA' } as any}
-                required
-                disabled={loading}
-              />
-              <div className="cf-turnstile" data-sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} data-callback="onTurnstileSuccess"></div>
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full py-3 rounded-lg font-medium text-white transition disabled:opacity-50 disabled:cursor-not-allowed"
-                style={{ backgroundColor: '#0073EA' }}
-                onMouseOver={(e) => !loading && turnstileToken && (e.currentTarget.style.backgroundColor = '#005bb5')}
-                onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#0073EA')}
-              >
-                {loading ? 'Checking...' : 'Check URL'}
-              </button>
-            </form>
-          ) : (
-            <form onSubmit={handleCheckEmail} className="space-y-4">
-              <textarea
-                value={emailContent}
-                onChange={(e) => setEmailContent(e.target.value)}
-                placeholder="Paste email content here..."
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                style={{ '--tw-ring-color': '#0073EA' } as any}
-                rows={8}
-                required
-                disabled={loading}
-              />
-              <p className="text-xs text-gray-500">
-                We'll automatically extract and check all URLs
-              </p>
-              <div className="cf-turnstile" data-sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} data-callback="onTurnstileSuccess"></div>
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full py-3 rounded-lg font-medium text-white transition disabled:opacity-50 disabled:cursor-not-allowed"
-                style={{ backgroundColor: '#0073EA' }}
-                onMouseOver={(e) => !loading && turnstileToken && (e.currentTarget.style.backgroundColor = '#005bb5')}
-                onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#0073EA')}
-              >
-                {loading ? 'Analyzing...' : 'Analyze Email'}
-              </button>
-            </form>
-          )}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <textarea
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="Paste URL(s) or email content here...&#10;&#10;Examples:&#10;https://example.com&#10;or paste entire email with multiple URLs"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              style={{ '--tw-ring-color': '#0073EA' } as any}
+              rows={6}
+              required
+              disabled={loading}
+            />
+            <p className="text-xs text-gray-500">
+              We'll automatically extract and check all URLs from your input
+            </p>
+            <div className="cf-turnstile" data-sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} data-callback="onTurnstileSuccess"></div>
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-3 rounded-lg font-medium text-white transition disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{ backgroundColor: '#0073EA' }}
+              onMouseOver={(e) => !loading && turnstileToken && (e.currentTarget.style.backgroundColor = '#005bb5')}
+              onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#0073EA')}
+            >
+              {loading ? 'Analyzing...' : 'Analyze'}
+            </button>
+          </form>
 
           {error && (
             <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
