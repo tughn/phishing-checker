@@ -106,6 +106,15 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `window.turnstileCallbacks = [];
+window.onTurnstileSuccess = function(token) {
+  console.log('Turnstile success:', token);
+  window.turnstileCallbacks.forEach(cb => cb(token));
+};`
+          }}
+        />
         <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
       </head>
       <body

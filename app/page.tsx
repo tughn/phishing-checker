@@ -40,12 +40,16 @@ export default function Home() {
 
   // Set up global Turnstile callback
   useEffect(() => {
-    (window as any).onTurnstileSuccess = (token: string) => {
+    const callback = (token: string) => {
+      console.log('React received token:', token);
       setTurnstileToken(token);
     };
 
+    (window as any).turnstileCallbacks.push(callback);
+
     return () => {
-      delete (window as any).onTurnstileSuccess;
+      const idx = (window as any).turnstileCallbacks.indexOf(callback);
+      if (idx > -1) (window as any).turnstileCallbacks.splice(idx, 1);
     };
   }, []);
 
