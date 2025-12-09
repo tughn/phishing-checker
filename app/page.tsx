@@ -36,7 +36,6 @@ export default function Home() {
   const [multiResult, setMultiResult] = useState<MultiUrlResult | null>(null);
   const [error, setError] = useState('');
   const [turnstileToken, setTurnstileToken] = useState<string>('');
-  const [turnstileResetKey, setTurnstileResetKey] = useState(0);
 
   // Set up global Turnstile callback
   useEffect(() => {
@@ -97,9 +96,16 @@ export default function Home() {
 
       setResult(data);
 
-      // Reset turnstile after successful submission
-      setTurnstileToken('');
-      setTurnstileResetKey(prev => prev + 1);
+      // Use Turnstile reset API instead of React key change
+      if (typeof window !== 'undefined' && (window as any).turnstile) {
+        const widgets = document.querySelectorAll('.cf-turnstile');
+        if (widgets.length > 0) {
+          const widgetId = widgets[0].getAttribute('data-widget-id');
+          if (widgetId) {
+            (window as any).turnstile.reset(widgetId);
+          }
+        }
+      }
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -169,9 +175,16 @@ export default function Home() {
         cleanCount: clean,
       });
 
-      // Reset turnstile after successful submission
-      setTurnstileToken('');
-      setTurnstileResetKey(prev => prev + 1);
+      // Use Turnstile reset API instead of React key change
+      if (typeof window !== 'undefined' && (window as any).turnstile) {
+        const widgets = document.querySelectorAll('.cf-turnstile');
+        if (widgets.length > 1) {
+          const widgetId = widgets[1].getAttribute('data-widget-id');
+          if (widgetId) {
+            (window as any).turnstile.reset(widgetId);
+          }
+        }
+      }
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -217,8 +230,6 @@ export default function Home() {
               setError('');
               setResult(null);
               setMultiResult(null);
-              setTurnstileToken('');
-              setTurnstileResetKey(prev => prev + 1);
             }}
             className={`px-5 py-2.5 font-medium rounded-t-lg transition ${
               mode === 'url'
@@ -235,8 +246,6 @@ export default function Home() {
               setError('');
               setResult(null);
               setMultiResult(null);
-              setTurnstileToken('');
-              setTurnstileResetKey(prev => prev + 1);
             }}
             className={`px-5 py-2.5 font-medium rounded-t-lg transition ${
               mode === 'email'
@@ -263,7 +272,7 @@ export default function Home() {
                 required
                 disabled={loading}
               />
-              <div key={`turnstile-url-${turnstileResetKey}`} className="cf-turnstile" data-sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} data-callback="onTurnstileSuccess"></div>
+              <div className="cf-turnstile" data-sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} data-callback="onTurnstileSuccess"></div>
               <button
                 type="submit"
                 disabled={loading}
@@ -290,7 +299,7 @@ export default function Home() {
               <p className="text-xs text-gray-500">
                 We'll automatically extract and check all URLs
               </p>
-              <div key={`turnstile-email-${turnstileResetKey}`} className="cf-turnstile" data-sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} data-callback="onTurnstileSuccess"></div>
+              <div className="cf-turnstile" data-sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} data-callback="onTurnstileSuccess"></div>
               <button
                 type="submit"
                 disabled={loading}
