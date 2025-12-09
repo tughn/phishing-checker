@@ -35,6 +35,7 @@ export default function Home() {
   const [result, setResult] = useState<CheckResult | null>(null);
   const [multiResult, setMultiResult] = useState<MultiUrlResult | null>(null);
   const [error, setError] = useState('');
+  const [turnstileToken, setTurnstileToken] = useState<string>('');
 
   const extractUrls = (text: string): string[] => {
     const urlRegex = /(https?:\/\/[^\s<>"{}|\\^`\[\]]+)/gi;
@@ -44,6 +45,12 @@ export default function Home() {
 
   const handleCheckUrl = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!turnstileToken) {
+      setError('Please complete the security verification');
+      return;
+    }
+
     setLoading(true);
     setError('');
     setResult(null);
@@ -53,7 +60,7 @@ export default function Home() {
       const response = await fetch('/api/check-url', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url }),
+        body: JSON.stringify({ url, turnstileToken }),
       });
 
       const data = await response.json();
@@ -63,6 +70,12 @@ export default function Home() {
       }
 
       setResult(data);
+
+      // Reset turnstile after successful submission
+      if (typeof window !== 'undefined' && (window as any).turnstile) {
+        (window as any).turnstile.reset();
+        setTurnstileToken('');
+      }
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -72,6 +85,12 @@ export default function Home() {
 
   const handleCheckEmail = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!turnstileToken) {
+      setError('Please complete the security verification');
+      return;
+    }
+
     setLoading(true);
     setError('');
     setResult(null);
@@ -92,7 +111,7 @@ export default function Home() {
           const response = await fetch('/api/check-url', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ url }),
+            body: JSON.stringify({ url, turnstileToken }),
           });
 
           const data = await response.json();
@@ -115,6 +134,12 @@ export default function Home() {
         suspiciousCount: suspicious,
         cleanCount: clean,
       });
+
+      // Reset turnstile after successful submission
+      if (typeof window !== 'undefined' && (window as any).turnstile) {
+        (window as any).turnstile.reset();
+        setTurnstileToken('');
+      }
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -202,12 +227,13 @@ export default function Home() {
                 required
                 disabled={loading}
               />
+              <div className="cf-turnstile" data-sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} data-callback={(token: string) => setTurnstileToken(token)}></div>
               <button
                 type="submit"
-                disabled={loading}
-                className="w-full py-3 rounded-lg font-medium text-white transition"
+                disabled={loading || !turnstileToken}
+                className="w-full py-3 rounded-lg font-medium text-white transition disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{ backgroundColor: '#0073EA' }}
-                onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#005bb5')}
+                onMouseOver={(e) => !loading && turnstileToken && (e.currentTarget.style.backgroundColor = '#005bb5')}
                 onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#0073EA')}
               >
                 {loading ? 'Checking...' : 'Check URL'}
@@ -228,12 +254,13 @@ export default function Home() {
               <p className="text-xs text-gray-500">
                 We'll automatically extract and check all URLs
               </p>
+              <div className="cf-turnstile" data-sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} data-callback={(token: string) => setTurnstileToken(token)}></div>
               <button
                 type="submit"
-                disabled={loading}
-                className="w-full py-3 rounded-lg font-medium text-white transition"
+                disabled={loading || !turnstileToken}
+                className="w-full py-3 rounded-lg font-medium text-white transition disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{ backgroundColor: '#0073EA' }}
-                onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#005bb5')}
+                onMouseOver={(e) => !loading && turnstileToken && (e.currentTarget.style.backgroundColor = '#005bb5')}
                 onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#0073EA')}
               >
                 {loading ? 'Analyzing...' : 'Analyze Email'}
