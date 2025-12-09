@@ -28,9 +28,9 @@ function checkRateLimit(ip: string): boolean {
 
 function cleanupExpiredTokens() {
   const now = Date.now();
-  const fiveMinutes = 5 * 60 * 1000;
+  const thirtyMinutes = 30 * 60 * 1000;
   for (const [token, data] of verifiedTokens.entries()) {
-    if (now - data.verifiedAt > fiveMinutes) {
+    if (now - data.verifiedAt > thirtyMinutes) {
       verifiedTokens.delete(token);
     }
   }
