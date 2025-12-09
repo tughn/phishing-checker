@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 
 interface CheckResult {
@@ -37,6 +37,17 @@ export default function Home() {
   const [error, setError] = useState('');
   const [turnstileToken, setTurnstileToken] = useState<string>('');
   const [turnstileResetKey, setTurnstileResetKey] = useState(0);
+
+  // Set up global Turnstile callback
+  useEffect(() => {
+    (window as any).onTurnstileSuccess = (token: string) => {
+      setTurnstileToken(token);
+    };
+
+    return () => {
+      delete (window as any).onTurnstileSuccess;
+    };
+  }, []);
 
   const extractUrls = (text: string): string[] => {
     const urlRegex = /(https?:\/\/[^\s<>"{}|\\^`\[\]]+)/gi;
@@ -228,7 +239,7 @@ export default function Home() {
                 required
                 disabled={loading}
               />
-              <div key={`turnstile-url-${turnstileResetKey}`} className="cf-turnstile" data-sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} data-callback={(token: string) => setTurnstileToken(token)}></div>
+              <div key={`turnstile-url-${turnstileResetKey}`} className="cf-turnstile" data-sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} data-callback="onTurnstileSuccess"></div>
               <button
                 type="submit"
                 disabled={loading || !turnstileToken}
@@ -255,7 +266,7 @@ export default function Home() {
               <p className="text-xs text-gray-500">
                 We'll automatically extract and check all URLs
               </p>
-              <div key={`turnstile-email-${turnstileResetKey}`} className="cf-turnstile" data-sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} data-callback={(token: string) => setTurnstileToken(token)}></div>
+              <div key={`turnstile-email-${turnstileResetKey}`} className="cf-turnstile" data-sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} data-callback="onTurnstileSuccess"></div>
               <button
                 type="submit"
                 disabled={loading || !turnstileToken}
