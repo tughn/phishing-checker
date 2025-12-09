@@ -36,6 +36,7 @@ export default function Home() {
   const [multiResult, setMultiResult] = useState<MultiUrlResult | null>(null);
   const [error, setError] = useState('');
   const [turnstileToken, setTurnstileToken] = useState<string>('');
+  const [turnstileResetKey, setTurnstileResetKey] = useState(0);
 
   const extractUrls = (text: string): string[] => {
     const urlRegex = /(https?:\/\/[^\s<>"{}|\\^`\[\]]+)/gi;
@@ -72,10 +73,8 @@ export default function Home() {
       setResult(data);
 
       // Reset turnstile after successful submission
-      if (typeof window !== 'undefined' && (window as any).turnstile) {
-        (window as any).turnstile.reset();
-        setTurnstileToken('');
-      }
+      setTurnstileToken('');
+      setTurnstileResetKey(prev => prev + 1);
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -136,10 +135,8 @@ export default function Home() {
       });
 
       // Reset turnstile after successful submission
-      if (typeof window !== 'undefined' && (window as any).turnstile) {
-        (window as any).turnstile.reset();
-        setTurnstileToken('');
-      }
+      setTurnstileToken('');
+      setTurnstileResetKey(prev => prev + 1);
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -185,6 +182,8 @@ export default function Home() {
               setError('');
               setResult(null);
               setMultiResult(null);
+              setTurnstileToken('');
+              setTurnstileResetKey(prev => prev + 1);
             }}
             className={`px-5 py-2.5 font-medium rounded-t-lg transition ${
               mode === 'url'
@@ -201,6 +200,8 @@ export default function Home() {
               setError('');
               setResult(null);
               setMultiResult(null);
+              setTurnstileToken('');
+              setTurnstileResetKey(prev => prev + 1);
             }}
             className={`px-5 py-2.5 font-medium rounded-t-lg transition ${
               mode === 'email'
@@ -227,7 +228,7 @@ export default function Home() {
                 required
                 disabled={loading}
               />
-              <div className="cf-turnstile" data-sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} data-callback={(token: string) => setTurnstileToken(token)}></div>
+              <div key={`turnstile-url-${turnstileResetKey}`} className="cf-turnstile" data-sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} data-callback={(token: string) => setTurnstileToken(token)}></div>
               <button
                 type="submit"
                 disabled={loading || !turnstileToken}
@@ -254,7 +255,7 @@ export default function Home() {
               <p className="text-xs text-gray-500">
                 We'll automatically extract and check all URLs
               </p>
-              <div className="cf-turnstile" data-sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} data-callback={(token: string) => setTurnstileToken(token)}></div>
+              <div key={`turnstile-email-${turnstileResetKey}`} className="cf-turnstile" data-sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} data-callback={(token: string) => setTurnstileToken(token)}></div>
               <button
                 type="submit"
                 disabled={loading || !turnstileToken}
