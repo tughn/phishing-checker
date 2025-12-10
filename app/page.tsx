@@ -12,8 +12,11 @@ interface CheckResult {
   checks: {
     virustotal?: any;
     safeBrowsing?: any;
+    openphish?: any;
+    urlhaus?: any;
     ssl?: any;
-    domain?: any;
+    whois?: any;
+    redirects?: any;
   };
 }
 
@@ -388,17 +391,126 @@ export default function Home() {
                   </div>
                 )}
 
+                {result.checks.openphish && result.checks.openphish.checked && (
+                  <div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                      </svg>
+                      <h4 className="font-semibold text-gray-900">OpenPhish Database</h4>
+                    </div>
+                    <p className={`text-sm ${result.checks.openphish.listed ? 'text-red-600 font-semibold' : 'text-green-600'}`}>
+                      {result.checks.openphish.listed ? '⚠️ Listed in phishing database' : '✓ Not listed'}
+                    </p>
+                  </div>
+                )}
+
+                {result.checks.urlhaus && result.checks.urlhaus.checked && (
+                  <div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                      </svg>
+                      <h4 className="font-semibold text-gray-900">URLhaus (Malware Database)</h4>
+                    </div>
+                    {result.checks.urlhaus.listed ? (
+                      <div>
+                        <p className="text-sm text-red-600 font-semibold">⚠️ Listed as {result.checks.urlhaus.threat}</p>
+                        {result.checks.urlhaus.tags && result.checks.urlhaus.tags.length > 0 && (
+                          <div className="flex gap-1 mt-2">
+                            {result.checks.urlhaus.tags.map((tag: string, idx: number) => (
+                              <span key={idx} className="px-2 py-0.5 bg-red-100 text-red-700 text-xs rounded">
+                                {tag}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <p className="text-sm text-green-600">✓ Not listed</p>
+                    )}
+                  </div>
+                )}
+
                 {result.checks.ssl && (
                   <div>
                     <div className="flex items-center gap-2 mb-2">
                       <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                       </svg>
-                      <h4 className="font-semibold text-gray-900">Connection Security</h4>
+                      <h4 className="font-semibold text-gray-900">SSL Certificate</h4>
                     </div>
-                    <p className={`text-sm ${result.checks.ssl.secure ? 'text-green-600' : 'text-orange-600'}`}>
-                      {result.checks.ssl.secure ? 'Secure HTTPS connection' : 'Insecure HTTP connection'}
-                    </p>
+                    <div className="space-y-2">
+                      <p className={`text-sm ${result.checks.ssl.secure ? 'text-green-600' : 'text-orange-600'}`}>
+                        {result.checks.ssl.secure ? '✓ Secure HTTPS connection' : '⚠ Insecure HTTP connection'}
+                      </p>
+                      {result.checks.ssl.certificate && !result.checks.ssl.certificate.error && (
+                        <div className="text-xs text-gray-600 space-y-1 pl-4 border-l-2 border-gray-200">
+                          <div><span className="font-medium">Issuer:</span> {result.checks.ssl.certificate.issuer}</div>
+                          <div><span className="font-medium">Certificate Age:</span> {result.checks.ssl.certificate.certAge} days</div>
+                          <div><span className="font-medium">Expires in:</span> {result.checks.ssl.certificate.daysUntilExpiry} days</div>
+                          {result.checks.ssl.certificate.isLetsEncrypt && (
+                            <div className="text-orange-600">⚠ Free Let's Encrypt certificate</div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {result.checks.whois && !result.checks.whois.error && (
+                  <div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+                      </svg>
+                      <h4 className="font-semibold text-gray-900">Domain Information</h4>
+                    </div>
+                    <div className="text-xs text-gray-600 space-y-1 pl-4 border-l-2 border-gray-200">
+                      {result.checks.whois.domainAge !== null && result.checks.whois.domainAge !== undefined && (
+                        <div className={result.checks.whois.isNew ? 'text-red-600 font-semibold' : ''}>
+                          <span className="font-medium">Domain Age:</span> {result.checks.whois.domainAge} days
+                          {result.checks.whois.isNew && ' ⚠️ (NEW DOMAIN)'}
+                        </div>
+                      )}
+                      {result.checks.whois.registrar && (
+                        <div><span className="font-medium">Registrar:</span> {result.checks.whois.registrar}</div>
+                      )}
+                      {result.checks.whois.createdDate && (
+                        <div><span className="font-medium">Created:</span> {new Date(result.checks.whois.createdDate).toLocaleDateString()}</div>
+                      )}
+                      {result.checks.whois.privacyProtected && (
+                        <div className="text-orange-600">⚠ Privacy protection enabled</div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {result.checks.redirects && !result.checks.redirects.error && result.checks.redirects.redirectCount > 0 && (
+                  <div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                      </svg>
+                      <h4 className="font-semibold text-gray-900">Redirect Analysis</h4>
+                    </div>
+                    <div className="space-y-2">
+                      <p className={`text-sm ${result.checks.redirects.crossDomain ? 'text-orange-600' : 'text-gray-600'}`}>
+                        {result.checks.redirects.redirectCount} redirect{result.checks.redirects.redirectCount > 1 ? 's' : ''}
+                        {result.checks.redirects.crossDomain && ' (cross-domain)'}
+                      </p>
+                      {result.checks.redirects.chain && result.checks.redirects.chain.length > 1 && (
+                        <div className="text-xs text-gray-600 space-y-1 pl-4 border-l-2 border-gray-200 max-h-32 overflow-y-auto">
+                          {result.checks.redirects.chain.map((hop: any, idx: number) => (
+                            <div key={idx} className="flex items-center gap-2">
+                              <span className="font-medium">{idx + 1}.</span>
+                              <span className="text-gray-500">[{hop.status}]</span>
+                              <span className="break-all">{hop.url}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
               </div>
