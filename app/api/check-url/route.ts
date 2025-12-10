@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import axios from 'axios';
+import * as tls from 'tls';
+import * as net from 'net';
+import { URL } from 'url';
 
 const VIRUSTOTAL_API_KEY = process.env.VIRUSTOTAL_API_KEY;
 const GOOGLE_SAFE_BROWSING_API_KEY = process.env.GOOGLE_SAFE_BROWSING_API_KEY;
@@ -59,6 +62,188 @@ interface SafeBrowsingResponse {
       url: string;
     };
   }>;
+}
+
+// Helper: Check OpenPhish database
+async function checkOpenPhish(url: string): Promise<any> {
+  try {
+    const response = await axios.get('https://openphish.com/feed.txt', { timeout: 10000 });
+    const phishingUrls = response.data.split('\n').filter((line: string) => line.trim());
+    const isListed = phishingUrls.some((phishUrl: string) => url.includes(phishUrl) || phishUrl.includes(url));
+
+    return {
+      listed: isListed,
+      source: 'OpenPhish',
+      checked: true
+    };
+  } catch (error) {
+    return { error: 'OpenPhish check failed', checked: false };
+  }
+}
+
+// Helper: Check URLhaus database
+async function checkURLhaus(url: string): Promise<any> {
+  try {
+    const response = await axios.post(
+      'https://urlhaus-api.abuse.ch/v1/url/',
+      new URLSearchParams({ url }),
+      {
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        timeout: 10000
+      }
+    );
+
+    if (response.data.query_status === 'ok') {
+      return {
+        listed: true,
+        threat: response.data.threat || 'malware',
+        tags: response.data.tags || [],
+        source: 'URLhaus',
+        checked: true
+      };
+    }
+
+    return { listed: false, source: 'URLhaus', checked: true };
+  } catch (error) {
+    return { error: 'URLhaus check failed', checked: false };
+  }
+}
+
+// Helper: Get SSL certificate details
+async function getSSLCertificate(hostname: string, port: number = 443): Promise<any> {
+  return new Promise((resolve) => {
+    const socket = net.connect(port, hostname, () => {
+      const secureSocket = tls.connect({
+        socket: socket,
+        servername: hostname,
+        rejectUnauthorized: false
+      }, () => {
+        const cert = secureSocket.getPeerCertificate();
+        secureSocket.end();
+
+        if (cert && Object.keys(cert).length > 0) {
+          const validFrom = new Date(cert.valid_from);
+          const validTo = new Date(cert.valid_to);
+          const now = new Date();
+          const certAge = Math.floor((now.getTime() - validFrom.getTime()) / (1000 * 60 * 60 * 24));
+
+          resolve({
+            issuer: cert.issuer?.O || cert.issuer?.CN || 'Unknown',
+            validFrom: cert.valid_from,
+            validTo: cert.valid_to,
+            daysUntilExpiry: Math.floor((validTo.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)),
+            certAge: certAge,
+            subject: cert.subject?.CN || hostname,
+            isLetsEncrypt: cert.issuer?.O?.includes("Let's Encrypt") || false
+          });
+        } else {
+          resolve({ error: 'No certificate found' });
+        }
+      });
+
+      secureSocket.on('error', () => {
+        resolve({ error: 'Failed to retrieve certificate' });
+      });
+    });
+
+    socket.on('error', () => {
+      resolve({ error: 'Failed to connect' });
+    });
+
+    socket.setTimeout(10000, () => {
+      socket.destroy();
+      resolve({ error: 'Connection timeout' });
+    });
+  });
+}
+
+// Helper: Follow redirect chain
+async function followRedirects(url: string): Promise<any> {
+  const chain: Array<{url: string, status: number}> = [];
+  let currentUrl = url;
+  let redirectCount = 0;
+  const maxRedirects = 10;
+
+  try {
+    while (redirectCount < maxRedirects) {
+      const response = await axios.get(currentUrl, {
+        maxRedirects: 0,
+        validateStatus: (status) => status >= 200 && status < 400,
+        timeout: 10000
+      });
+
+      chain.push({ url: currentUrl, status: response.status });
+
+      if (response.status >= 300 && response.status < 400 && response.headers.location) {
+        const nextUrl = new URL(response.headers.location, currentUrl).href;
+        currentUrl = nextUrl;
+        redirectCount++;
+      } else {
+        break;
+      }
+    }
+
+    const domains = chain.map(c => new URL(c.url).hostname);
+    const uniqueDomains = [...new Set(domains)];
+
+    return {
+      chain,
+      redirectCount: chain.length - 1,
+      finalUrl: chain[chain.length - 1]?.url || url,
+      crossDomain: uniqueDomains.length > 1,
+      domains: uniqueDomains
+    };
+  } catch (error: any) {
+    if (error.response && error.response.status >= 300 && error.response.status < 400) {
+      chain.push({ url: currentUrl, status: error.response.status });
+      if (error.response.headers.location) {
+        const nextUrl = new URL(error.response.headers.location, currentUrl).href;
+        return followRedirects(nextUrl);
+      }
+    }
+
+    return {
+      chain: chain.length > 0 ? chain : [{ url, status: 0 }],
+      error: 'Failed to follow redirects',
+      redirectCount: chain.length - 1
+    };
+  }
+}
+
+// Helper: Perform WHOIS lookup (simplified - uses whois-json package)
+async function performWHOIS(domain: string): Promise<any> {
+  try {
+    // For now, we'll use a public WHOIS API
+    const response = await axios.get(`https://www.whoisxmlapi.com/whoisserver/WhoisService?apiKey=at_free&domainName=${domain}&outputFormat=JSON`, {
+      timeout: 10000
+    });
+
+    const data = response.data?.WhoisRecord;
+    if (data) {
+      const createdDate = data.createdDate ? new Date(data.createdDate) : null;
+      const now = new Date();
+      const domainAge = createdDate ? Math.floor((now.getTime() - createdDate.getTime()) / (1000 * 60 * 60 * 24)) : null;
+
+      return {
+        registrar: data.registrarName || 'Unknown',
+        createdDate: data.createdDate,
+        expiresDate: data.expiresDate,
+        updatedDate: data.updatedDate,
+        domainAge: domainAge,
+        isNew: domainAge !== null && domainAge < 30,
+        privacyProtected: data.registrant?.organization?.toLowerCase().includes('privacy') ||
+                          data.registrant?.organization?.toLowerCase().includes('redacted') || false
+      };
+    }
+
+    return { error: 'WHOIS data not available' };
+  } catch (error) {
+    // Fallback: just calculate basic info
+    return {
+      error: 'WHOIS lookup failed - using free tier limits',
+      note: 'Domain age check requires premium WHOIS API for detailed info'
+    };
+  }
 }
 
 export async function POST(request: NextRequest) {
@@ -244,32 +429,65 @@ export async function POST(request: NextRequest) {
       };
     }
 
-    // 3. SSL Check
+    // 3. OpenPhish Check
+    try {
+      results.checks.openphish = await checkOpenPhish(validUrl);
+    } catch (error) {
+      results.checks.openphish = { error: 'OpenPhish check failed' };
+    }
+
+    // 4. URLhaus Check
+    try {
+      results.checks.urlhaus = await checkURLhaus(validUrl);
+    } catch (error) {
+      results.checks.urlhaus = { error: 'URLhaus check failed' };
+    }
+
+    // 5. SSL Certificate Details
     try {
       const urlObj = new URL(validUrl);
-      results.checks.ssl = {
-        protocol: urlObj.protocol,
-        secure: urlObj.protocol === 'https:',
-      };
+      if (urlObj.protocol === 'https:') {
+        const certDetails = await getSSLCertificate(urlObj.hostname);
+        results.checks.ssl = {
+          protocol: urlObj.protocol,
+          secure: true,
+          certificate: certDetails
+        };
+      } else {
+        results.checks.ssl = {
+          protocol: urlObj.protocol,
+          secure: false,
+        };
+      }
     } catch (error) {
       results.checks.ssl = {
         error: 'SSL check failed',
       };
     }
 
-    // 4. Domain Age Check (basic)
+    // 6. WHOIS & Domain Age
     try {
       const urlObj = new URL(validUrl);
       const domain = urlObj.hostname;
+      const whoisData = await performWHOIS(domain);
 
-      // This is a simplified check - in production you'd use a proper WHOIS API
-      results.checks.domain = {
+      results.checks.whois = {
         hostname: domain,
-        note: 'Domain age check requires WHOIS API (not implemented in free version)',
+        ...whoisData
       };
     } catch (error) {
-      results.checks.domain = {
-        error: 'Domain check failed',
+      results.checks.whois = {
+        error: 'WHOIS check failed',
+      };
+    }
+
+    // 7. Redirect Chain Analysis
+    try {
+      const redirectData = await followRedirects(validUrl);
+      results.checks.redirects = redirectData;
+    } catch (error) {
+      results.checks.redirects = {
+        error: 'Redirect analysis failed',
       };
     }
 
@@ -283,6 +501,18 @@ export async function POST(request: NextRequest) {
 
     let isSuspicious = false;
     let suspicionReasons: string[] = [];
+
+    // Check OpenPhish
+    if (results.checks.openphish?.listed) {
+      isSuspicious = true;
+      suspicionReasons.push('Listed in OpenPhish phishing database');
+    }
+
+    // Check URLhaus
+    if (results.checks.urlhaus?.listed) {
+      isSuspicious = true;
+      suspicionReasons.push(`Listed in URLhaus as ${results.checks.urlhaus.threat}`);
+    }
 
     // Check if Google Safe Browsing flagged it
     if (results.checks.safeBrowsing?.threats?.length > 0) {
@@ -307,6 +537,23 @@ export async function POST(request: NextRequest) {
       if (!suspicionReasons.some(r => r.includes('security engine'))) {
         suspicionReasons.push(`${results.checks.virustotal.malicious} security engines flagged this`);
       }
+    }
+
+    // Check domain age
+    if (results.checks.whois?.isNew) {
+      suspicionReasons.push(`Domain registered within last 30 days (${results.checks.whois.domainAge} days old)`);
+    }
+
+    // Check Let's Encrypt + new domain combination
+    if (results.checks.ssl?.certificate?.isLetsEncrypt && results.checks.whois?.isNew) {
+      if (!suspicionReasons.some(r => r.includes('Domain registered'))) {
+        suspicionReasons.push('New domain with free SSL certificate');
+      }
+    }
+
+    // Check suspicious redirects
+    if (results.checks.redirects?.crossDomain && results.checks.redirects?.redirectCount > 2) {
+      suspicionReasons.push(`Multiple cross-domain redirects (${results.checks.redirects.redirectCount} hops)`);
     }
 
     results.isSuspicious = isSuspicious;
