@@ -1,59 +1,78 @@
 @import "tailwindcss";
 
 :root {
-  /* Sendmarc Brand Colors */
-  --sendmarc-primary: #0073EA;
-  --sendmarc-primary-dark: #005bb5;
-  --sendmarc-dark: #1f2124;
-  --sendmarc-gray: #69727d;
-  --sendmarc-light-gray: #d5d8dc;
-  --sendmarc-bg: #ffffff;
-
   --background: #ffffff;
-  --foreground: #1f2124;
+  --foreground: #1F2937;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-sendmarc-primary: var(--sendmarc-primary);
-  --color-sendmarc-primary-dark: var(--sendmarc-primary-dark);
-  --color-sendmarc-dark: var(--sendmarc-dark);
-  --color-sendmarc-gray: var(--sendmarc-gray);
-  --color-sendmarc-light-gray: var(--sendmarc-light-gray);
 }
 
 body {
-  background: var(--background);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: var(--foreground);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   margin: 0;
   padding: 0;
+  min-height: 100vh;
 }
 
 /* Smooth transitions for all interactive elements */
 * {
-  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, opacity 0.2s ease;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, opacity 0.2s ease, transform 0.2s ease;
 }
 
-/* Sendmarc Button Styles */
-.btn-sendmarc {
-  border: 1px solid var(--sendmarc-primary);
-  color: var(--sendmarc-primary);
-  background: transparent;
-  padding: 0.5rem 1rem;
-  border-radius: 3px;
+/* Fade-in animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.6s ease-out;
+}
+
+/* Rotating spinner animation */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Gradient text effect */
+.gradient-text {
+  background: linear-gradient(135deg, #8B5CF6 0%, #3B82F6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Button gradient with hover brightness */
+.btn-gradient {
+  background: linear-gradient(135deg, #8B5CF6 0%, #3B82F6 100%);
   transition: all 0.3s ease;
-  cursor: pointer;
-  font-weight: 500;
 }
 
-.btn-sendmarc:hover {
-  background: var(--sendmarc-primary);
-  color: white;
+.btn-gradient:hover {
+  filter: brightness(1.1);
+  transform: scale(1.02);
 }
 
-.btn-sendmarc:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+.btn-gradient:active {
+  transform: scale(0.98);
 }

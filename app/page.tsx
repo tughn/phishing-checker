@@ -180,43 +180,30 @@ export default function Home() {
 
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-200">
-        <div className="max-w-5xl mx-auto px-6 py-4 flex items-center gap-3">
-          <Image
-            src="https://help.sendmarc.com/hubfs/Sendmarc-Logo-RGB-Main.jpg"
-            alt="Sendmarc"
-            width={140}
-            height={36}
-            className="h-9 w-auto"
-          />
-          <span className="text-gray-300">|</span>
-          <h1 className="text-lg font-medium text-gray-700">Phishing URL Checker</h1>
-        </div>
-      </header>
-
+    <div className="min-h-screen">
       {/* Main */}
-      <main className="max-w-5xl mx-auto px-6 py-12">
+      <main className="max-w-4xl mx-auto px-6 py-12">
         {/* Hero */}
-        <div className="text-center mb-10">
-          <h2 className="text-3xl font-bold text-gray-900 mb-3">
+        <div className="text-center mb-10 fade-in">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4 gradient-text">
+            Phishing URL Checker
+          </h1>
+          <p className="text-xl text-white/90 mb-2">
             Check URLs for Phishing & Malware
-          </h2>
-          <p className="text-gray-600">
+          </p>
+          <p className="text-white/70">
             Analyze single URLs or paste entire email content
           </p>
         </div>
 
         {/* Input Form */}
-        <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm mb-8">
+        <div className="bg-white rounded-xl shadow-lg p-6 md:p-8 mb-8 fade-in">
           <form onSubmit={handleSubmit} className="space-y-4">
             <textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Paste URL(s) or email content here...&#10;&#10;Examples:&#10;https://example.com&#10;or paste entire email with multiple URLs"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              style={{ '--tw-ring-color': '#0073EA' } as any}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
               rows={6}
               required
               disabled={loading}
@@ -227,18 +214,15 @@ export default function Home() {
             <div className="cf-turnstile" data-sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} data-callback="onTurnstileSuccess"></div>
             <button
               type="submit"
-              disabled={loading}
-              className="w-full py-3 rounded-lg font-medium text-white transition disabled:opacity-50 disabled:cursor-not-allowed"
-              style={{ backgroundColor: '#0073EA' }}
-              onMouseOver={(e) => !loading && turnstileToken && (e.currentTarget.style.backgroundColor = '#005bb5')}
-              onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#0073EA')}
+              disabled={loading || !turnstileToken}
+              className="w-full py-3 px-6 rounded-lg font-semibold text-white btn-gradient shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:hover:brightness-100"
             >
-              {loading ? 'Analyzing...' : 'Analyze'}
+              {loading ? 'Analyzing...' : 'Analyze URLs'}
             </button>
           </form>
 
           {error && (
-            <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
+            <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm">
               {error}
             </div>
           )}
@@ -246,17 +230,19 @@ export default function Home() {
 
         {/* Loading Skeleton */}
         {loading && (
-          <div className="space-y-6 animate-pulse">
-            <div className="rounded-lg border border-gray-200 bg-white p-8">
+          <div id="results-section" className="space-y-6 fade-in">
+            <div className="rounded-xl shadow-lg bg-white p-8">
               <div className="text-center space-y-4">
-                <div className="h-16 w-48 bg-gray-200 rounded-lg mx-auto"></div>
-                <div className="h-6 w-32 bg-gray-200 rounded mx-auto"></div>
-                <div className="h-4 w-64 bg-gray-200 rounded mx-auto"></div>
+                <div className="inline-block">
+                  <div className="w-16 h-16 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin"></div>
+                </div>
+                <div className="h-8 w-48 bg-gray-200 rounded-lg mx-auto"></div>
+                <div className="h-4 w-64 bg-gray-100 rounded mx-auto"></div>
               </div>
             </div>
-            <div className="rounded-lg border border-gray-200 bg-white p-6">
+            <div className="rounded-xl shadow-lg bg-white p-6">
               <div className="h-6 w-40 bg-gray-200 rounded mb-4"></div>
-              <div className="grid grid-cols-4 gap-3">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 {[1,2,3,4].map(i => (
                   <div key={i} className="h-20 bg-gray-100 rounded-lg"></div>
                 ))}
@@ -267,8 +253,8 @@ export default function Home() {
 
         {/* Single URL Result */}
         {result && !loading && (
-          <div className="space-y-6">
-            <div className={`rounded-lg border-2 p-10 transition-all ${
+          <div id="results-section" className="space-y-6 fade-in">
+            <div className={`rounded-xl shadow-lg border-2 p-10 transition-all duration-300 ${
               result.verdict === 'SUSPICIOUS'
                 ? 'bg-red-50 border-red-300'
                 : 'bg-green-50 border-green-300'
@@ -308,8 +294,8 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="bg-white rounded-lg border border-gray-200 p-6">
-              <h3 className="text-lg font-semibold mb-5 text-gray-900">Security Analysis</h3>
+            <div className="bg-white rounded-xl shadow-lg p-6">
+              <h3 className="text-2xl font-bold mb-5 text-gray-900">Security Analysis</h3>
 
               <div className="space-y-6">
                 {result.checks.virustotal && !result.checks.virustotal.error && !result.checks.virustotal.status && (
@@ -516,7 +502,7 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+            <div className="bg-white/90 rounded-xl shadow-lg p-4 border border-gray-200">
               <p className="text-sm text-gray-600 break-all">{result.url}</p>
             </div>
           </div>
@@ -524,9 +510,9 @@ export default function Home() {
 
         {/* Multi URL Results */}
         {multiResult && !loading && (
-          <div className="space-y-6">
+          <div id="results-section" className="space-y-6 fade-in">
             {/* Overall Email Risk */}
-            <div className={`rounded-lg border-2 p-10 transition-all ${
+            <div className={`rounded-xl shadow-lg border-2 p-10 transition-all duration-300 ${
               multiResult.suspiciousCount > 0
                 ? 'bg-red-50 border-red-300'
                 : 'bg-green-50 border-green-300'
@@ -556,35 +542,35 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="bg-white rounded-lg border border-gray-200 p-6">
-              <h3 className="text-lg font-semibold mb-4 text-gray-900">Summary</h3>
+            <div className="bg-white rounded-xl shadow-lg p-6">
+              <h3 className="text-2xl font-bold mb-5 text-gray-900">Summary</h3>
 
               <div className="grid grid-cols-3 gap-4">
-                <div className="bg-gray-50 p-4 rounded-lg text-center">
+                <div className="bg-gray-50 p-4 rounded-xl text-center transition-all duration-200 hover:scale-105 hover:shadow-md">
                   <div className="text-3xl font-bold text-gray-900">{multiResult.totalUrls}</div>
                   <div className="text-sm text-gray-600 mt-1">Total Links</div>
                 </div>
-                <div className="bg-red-50 p-4 rounded-lg text-center">
+                <div className="bg-red-50 p-4 rounded-xl text-center transition-all duration-200 hover:scale-105 hover:shadow-md">
                   <div className="text-3xl font-bold text-red-600">{multiResult.suspiciousCount}</div>
                   <div className="text-sm text-gray-600 mt-1">Suspicious</div>
                 </div>
-                <div className="bg-green-50 p-4 rounded-lg text-center">
+                <div className="bg-green-50 p-4 rounded-xl text-center transition-all duration-200 hover:scale-105 hover:shadow-md">
                   <div className="text-3xl font-bold text-green-600">{multiResult.cleanCount}</div>
                   <div className="text-sm text-gray-600 mt-1">Clean</div>
                 </div>
               </div>
 
               {multiResult.suspiciousCount > 0 && (
-                <div className="bg-red-50 border border-red-200 rounded-lg p-3 mt-4">
+                <div className="bg-red-50 border border-red-200 rounded-xl p-4 mt-4">
                   <p className="text-red-600 text-sm font-medium">⚠️ Do not click on suspicious links</p>
                 </div>
               )}
             </div>
 
             <div className="space-y-3">
-              <h3 className="text-lg font-semibold text-gray-900">URL Results</h3>
+              <h3 className="text-2xl font-bold text-white">URL Results</h3>
               {multiResult.results.map((res, idx) => (
-                <div key={idx} className={`rounded-lg border p-4 ${
+                <div key={idx} className={`rounded-xl shadow-lg border p-4 transition-all duration-300 hover:scale-102 ${
                   res.verdict === 'SUSPICIOUS'
                     ? 'bg-red-50 border-red-200'
                     : 'bg-green-50 border-green-200'
@@ -647,16 +633,15 @@ export default function Home() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-gray-200 py-6 mt-16">
-        <div className="max-w-5xl mx-auto px-6 text-center">
-          <p className="text-sm text-gray-600">
+      <footer className="py-8 mt-16">
+        <div className="max-w-4xl mx-auto px-6 text-center">
+          <p className="text-sm text-white/80">
             Powered by{' '}
             <a
               href="https://www.sendmarc.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:underline"
-              style={{ color: '#0073EA' }}
+              className="text-white font-semibold hover:underline transition-all duration-200 hover:brightness-125"
             >
               Sendmarc
             </a>
