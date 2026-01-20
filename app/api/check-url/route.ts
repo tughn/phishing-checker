@@ -236,9 +236,6 @@ async function performWHOIS(domain: string): Promise<any> {
 
 export async function POST(request: NextRequest) {
   try {
-    // Cleanup expired tokens periodically
-    cleanupExpiredTokens();
-
     // Rate limiting
     const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
     if (!checkRateLimit(ip)) {
