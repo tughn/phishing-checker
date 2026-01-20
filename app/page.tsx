@@ -36,31 +36,37 @@ export default function Home() {
   const [result, setResult] = useState<CheckResult | null>(null);
   const [multiResult, setMultiResult] = useState<MultiUrlResult | null>(null);
   const [error, setError] = useState('');
-  const [turnstileToken, setTurnstileToken] = useState<string>('');
-
-  useEffect(() => {
-    const callback = (token: string) => {
-      setTurnstileToken(token);
-    };
-
-    (window as any).turnstileCallbacks.push(callback);
-
-    return () => {
-      const idx = (window as any).turnstileCallbacks.indexOf(callback);
-      if (idx > -1) (window as any).turnstileCallbacks.splice(idx, 1);
-    };
-  }, []);
+  const [lastSubmitTime, setLastSubmitTime] = useState<number>(0);
 
   const extractUrls = (text: string): string[] => {
-    const urlRegex = /(https?:\/\/[^\s<>"{}|\\^`\[\]]+)/gi;
+    // Match URLs with or without protocol
+    const urlRegex = /(https?:\/\/[^\s<>"{}|\\^`\[\]]+|(?:www\.)?[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[a-zA-Z]{2,}(?:\/[^\s<>"{}|\\^`\[\]]*)?)/gi;
     const matches = text.match(urlRegex);
-    return matches ? [...new Set(matches)] : [];
+    if (!matches) return [];
+
+    // Normalize URLs and remove duplicates
+    const normalized = matches.map(url => {
+      if (!url.startsWith('http://') && !url.startsWith('https://')) {
+        return `https://${url}`;
+      }
+      return url;
+    });
+
+    return [...new Set(normalized)];
   };
 
   const isValidUrl = (urlString: string): boolean => {
     try {
-      const url = new URL(urlString.startsWith('http') ? urlString : `https://${urlString}`);
-      return url.hostname.includes('.') && url.hostname.length > 3;
+      // Add protocol if missing
+      const urlToValidate = urlString.startsWith('http') ? urlString : `https://${urlString}`;
+      const url = new URL(urlToValidate);
+
+      // Check if it has a proper domain (at least domain.tld format)
+      const hostname = url.hostname;
+      const parts = hostname.split('.');
+
+      // Must have at least 2 parts (domain.tld) and the TLD should be at least 2 chars
+      return parts.length >= 2 && parts[parts.length - 1].length >= 2 && hostname.length > 3;
     } catch {
       return false;
     }
@@ -69,16 +75,14 @@ export default function Home() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    let token = turnstileToken;
-    if (!token && typeof window !== 'undefined' && (window as any).turnstile) {
-      const widgets = document.querySelectorAll('.cf-turnstile');
-      if (widgets.length > 0) {
-        token = (window as any).turnstile.getResponse(widgets[0]);
-      }
-    }
+    // Rate limiting check
+    const now = Date.now();
+    const timeSinceLastSubmit = now - lastSubmitTime;
+    const minDelay = 10000; // 10 seconds
 
-    if (!token) {
-      setError('Please complete the security verification');
+    if (timeSinceLastSubmit < minDelay && lastSubmitTime !== 0) {
+      const remainingTime = Math.ceil((minDelay - timeSinceLastSubmit) / 1000);
+      setError(`Please wait ${remainingTime} seconds before submitting again`);
       return;
     }
 
@@ -86,6 +90,7 @@ export default function Home() {
     setError('');
     setResult(null);
     setMultiResult(null);
+    setLastSubmitTime(now);
 
     try {
       const urls = extractUrls(input.trim());
@@ -103,7 +108,7 @@ export default function Home() {
         const response = await fetch('/api/check-url', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ url: urls[0], turnstileToken: token }),
+          body: JSON.stringify({ url: urls[0] }),
         });
 
         const data = await response.json();
@@ -122,7 +127,7 @@ export default function Home() {
             const response = await fetch('/api/check-url', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ url, turnstileToken: token }),
+              body: JSON.stringify({ url }),
             });
 
             const data = await response.json();
@@ -198,13 +203,9 @@ export default function Home() {
                     disabled={loading}
                   />
 
-                  <div className="flex justify-center">
-                    <div className="cf-turnstile" data-sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} data-callback="onTurnstileSuccess"></div>
-                  </div>
-
                   <button
                     type="submit"
-                    disabled={loading || !turnstileToken}
+                    disabled={loading}
                     className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3.5 px-6 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-base"
                   >
                     {loading ? (

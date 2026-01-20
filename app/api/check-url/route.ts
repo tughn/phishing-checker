@@ -9,8 +9,6 @@ const GOOGLE_SAFE_BROWSING_API_KEY = process.env.GOOGLE_SAFE_BROWSING_API_KEY;
 
 // Simple in-memory rate limiting (for production, use Redis or database)
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
-// Track verified Turnstile tokens to allow reuse within a session
-const verifiedTokens = new Map<string, { ip: string; verifiedAt: number }>();
 
 function checkRateLimit(ip: string): boolean {
   const now = Date.now();
@@ -21,22 +19,12 @@ function checkRateLimit(ip: string): boolean {
     return true;
   }
 
-  if (limit.count >= 10) {  // 10 requests per minute
+  if (limit.count >= 5) {  // 5 requests per minute
     return false;
   }
 
   limit.count++;
   return true;
-}
-
-function cleanupExpiredTokens() {
-  const now = Date.now();
-  const thirtyMinutes = 30 * 60 * 1000;
-  for (const [token, data] of verifiedTokens.entries()) {
-    if (now - data.verifiedAt > thirtyMinutes) {
-      verifiedTokens.delete(token);
-    }
-  }
 }
 
 interface VirusTotalResponse {
@@ -260,54 +248,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { url, turnstileToken } = await request.json();
+    const { url } = await request.json();
 
     if (!url) {
       return NextResponse.json(
         { error: 'URL is required' },
         { status: 400 }
       );
-    }
-
-    // Verify Turnstile token
-    if (!turnstileToken) {
-      return NextResponse.json(
-        { error: 'Security verification required' },
-        { status: 400 }
-      );
-    }
-
-    // Check if token was already verified for this IP
-    const cachedToken = verifiedTokens.get(turnstileToken);
-    if (cachedToken && cachedToken.ip === ip) {
-      // Token already verified, allow reuse
-      console.log('Reusing verified Turnstile token');
-    } else {
-      // New token, verify with Cloudflare
-      const turnstileResponse = await fetch(
-        'https://challenges.cloudflare.com/turnstile/v0/siteverify',
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            secret: process.env.TURNSTILE_SECRET_KEY,
-            response: turnstileToken,
-            remoteip: ip,
-          }),
-        }
-      );
-
-      const turnstileData = await turnstileResponse.json();
-
-      if (!turnstileData.success) {
-        return NextResponse.json(
-          { error: 'Security verification failed. Please try again.' },
-          { status: 403 }
-        );
-      }
-
-      // Cache the verified token
-      verifiedTokens.set(turnstileToken, { ip, verifiedAt: Date.now() });
     }
 
     // Check API keys
