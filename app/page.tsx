@@ -188,7 +188,7 @@ export default function Home() {
             </li>
           </ul>
           <p className="bg-red-50 border border-red-200 rounded-lg p-3 text-sm">
-            <strong>⚠️ If you find a suspicious link:</strong> Do not click it, delete the message, and report it to your IT security team or the impersonated organization.
+            <strong>WARNING: If you find a suspicious link:</strong> Do not click it, delete the message, and report it to your IT security team or the impersonated organization.
           </p>
         </div>
       )
@@ -389,7 +389,7 @@ export default function Home() {
                 </p>
               </div>
 
-              <div className="bg-white rounded-2xl border border-gray-200/60 shadow-xl shadow-gray-200/50 p-8 hover:shadow-2xl hover:shadow-gray-300/50 transition-all duration-300">
+              <div className="bg-white rounded-2xl border border-gray-200/60 shadow-xl shadow-gray-200/50 p-8 hover:shadow-2xl hover:shadow-blue-500/10 hover:-translate-y-1 transition-all duration-300 ease-out">
                 <form onSubmit={handleSubmit} className="space-y-5">
                   <div className="relative">
                     <textarea
@@ -406,7 +406,7 @@ export default function Home() {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-base shadow-lg shadow-blue-600/30 hover:shadow-xl hover:shadow-blue-600/40 flex items-center justify-center gap-2 group"
+                    className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 ease-out disabled:opacity-50 disabled:cursor-not-allowed text-base shadow-lg shadow-blue-600/30 hover:shadow-xl hover:shadow-blue-600/50 hover:-translate-y-0.5 flex items-center justify-center gap-2 group active:scale-98"
                   >
                     {loading ? (
                       <>
@@ -432,7 +432,7 @@ export default function Home() {
 
               {/* Feature Highlights */}
               <div className="grid md:grid-cols-3 gap-6 mt-12">
-                <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-gray-200/50 hover:bg-white hover:shadow-lg hover:border-blue-200 transition-all duration-300 group">
+                <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-gray-200/50 hover:bg-white hover:shadow-lg hover:shadow-blue-500/10 hover:border-blue-200 hover:-translate-y-1 transition-all duration-300 ease-out group">
                   <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-4 group-hover:bg-blue-600 transition-colors duration-300">
                     <Shield className="w-6 h-6 text-blue-600 group-hover:text-white transition-colors duration-300" />
                   </div>
@@ -440,7 +440,7 @@ export default function Home() {
                   <p className="text-sm text-gray-600">Powered by VirusTotal's 70+ security engines and Google Safe Browsing</p>
                 </div>
 
-                <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-gray-200/50 hover:bg-white hover:shadow-lg hover:border-green-200 transition-all duration-300 group">
+                <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-gray-200/50 hover:bg-white hover:shadow-lg hover:shadow-green-500/10 hover:border-green-200 hover:-translate-y-1 transition-all duration-300 ease-out group">
                   <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mb-4 group-hover:bg-green-600 transition-colors duration-300">
                     <Lock className="w-6 h-6 text-green-600 group-hover:text-white transition-colors duration-300" />
                   </div>
@@ -448,7 +448,7 @@ export default function Home() {
                   <p className="text-sm text-gray-600">Verify HTTPS encryption and examine certificate validity</p>
                 </div>
 
-                <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-gray-200/50 hover:bg-white hover:shadow-lg hover:border-purple-200 transition-all duration-300 group">
+                <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-gray-200/50 hover:bg-white hover:shadow-lg hover:shadow-purple-500/10 hover:border-purple-200 hover:-translate-y-1 transition-all duration-300 ease-out group">
                   <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mb-4 group-hover:bg-purple-600 transition-colors duration-300">
                     <Globe className="w-6 h-6 text-purple-600 group-hover:text-white transition-colors duration-300" />
                   </div>
@@ -714,7 +714,7 @@ export default function Home() {
               {/* URL List */}
               <div className="space-y-4">
                 {multiResult.results.map((res, idx) => (
-                  <div key={idx} className={`bg-white rounded-2xl border-2 shadow-lg p-6 hover:shadow-xl transition-all duration-300 ${
+                  <div key={idx} className={`bg-white rounded-2xl border-2 shadow-lg p-6 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 ease-out ${
                     res.verdict === 'SUSPICIOUS' ? 'border-red-200' : 'border-green-200'
                   }`}>
                     <div className="flex items-start gap-4">
@@ -812,11 +812,11 @@ export default function Home() {
           {faqs.map((faq, index) => (
             <div
               key={index}
-              className="bg-white rounded-xl border border-gray-200/60 shadow-sm hover:shadow-md transition-all duration-200"
+              className="bg-white rounded-xl border border-gray-200/60 shadow-sm hover:shadow-lg hover:shadow-blue-500/5 hover:-translate-y-0.5 transition-all duration-300 ease-out"
             >
               <button
                 onClick={() => setOpenFaqIndex(openFaqIndex === index ? null : index)}
-                className="w-full flex items-center justify-between p-6 text-left hover:bg-gray-50/50 transition-colors rounded-xl"
+                className="w-full flex items-center justify-between p-6 text-left hover:bg-gray-50/50 transition-all duration-200 ease-out rounded-xl"
               >
                 <span className="font-semibold text-gray-900 text-lg pr-4">{faq.question}</span>
                 <ChevronDown
@@ -842,11 +842,11 @@ export default function Home() {
             {/* Company Info */}
             <div>
               <Image
-                src="https://help.sendmarc.com/hubfs/Sendmarc-Logo-RGB-Main.jpg"
+                src="https://i0.wp.com/ekoparty.org/wp-content/uploads/2024/10/Sendmarc-Logo-RGB-Main-Inverted-1.png?ssl=1"
                 alt="Sendmarc"
                 width={140}
                 height={36}
-                className="h-8 w-auto mb-6 brightness-0 invert"
+                className="h-8 w-auto mb-6"
               />
               <p className="text-sm text-gray-400 mb-4">
                 Protect your domain and email infrastructure with DMARC, SPF, and DKIM authentication.

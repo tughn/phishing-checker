@@ -6,7 +6,7 @@ A professional phishing URL detection tool powered by VirusTotal, Google Safe Br
 
 ---
 
-## 🚨 CRITICAL SECURITY NOTICE
+## CRITICAL SECURITY NOTICE
 
 **API keys were previously exposed in git history (commit a277130, January 21 2026).**
 
