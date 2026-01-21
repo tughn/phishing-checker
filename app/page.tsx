@@ -363,8 +363,7 @@ export default function Home() {
               className="h-8 w-auto"
             />
             <div className="h-6 w-px bg-gradient-to-b from-gray-300 to-transparent"></div>
-            <h1 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-              <Shield className="w-5 h-5 text-blue-600" />
+            <h1 className="text-lg font-semibold text-gray-900">
               Phishing URL Checker
             </h1>
           </div>
@@ -378,9 +377,6 @@ export default function Home() {
           {!result && !multiResult && (
             <div className="space-y-8 fade-in">
               <div className="text-center max-w-3xl mx-auto">
-                <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-2xl mb-6">
-                  <Search className="w-8 h-8 text-blue-600" />
-                </div>
                 <h2 className="text-4xl font-bold text-gray-900 mb-4">
                   Analyze URLs for Security Threats
                 </h2>
