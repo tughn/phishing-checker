@@ -13,7 +13,10 @@ import {
   Search,
   Loader2,
   XCircle,
-  Info
+  Info,
+  ExternalLink,
+  Mail,
+  Phone
 } from 'lucide-react';
 
 interface CheckResult {
@@ -50,6 +53,188 @@ export default function Home() {
   const [multiResult, setMultiResult] = useState<MultiUrlResult | null>(null);
   const [error, setError] = useState('');
   const [lastSubmitTime, setLastSubmitTime] = useState<number>(0);
+  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
+
+  const faqs = [
+    {
+      question: "How does the Phishing Link Checker work?",
+      answer: (
+        <div className="space-y-4">
+          <p>Sendmarc's Phishing Link Scanner detects phishing and malicious websites using multiple security layers and advanced threat intelligence.</p>
+          <p className="font-semibold">Here's how the tool works:</p>
+          <ul className="space-y-2 ml-6">
+            <li className="flex items-start gap-2">
+              <span className="text-blue-600 font-bold mt-1">•</span>
+              <span><strong>VirusTotal:</strong> Scans URLs against 70+ antivirus engines and security databases to identify known malicious sites</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-blue-600 font-bold mt-1">•</span>
+              <span><strong>Google Safe Browsing:</strong> Checks against Google's continuously updated database of unsafe web resources</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-blue-600 font-bold mt-1">•</span>
+              <span><strong>SSL Certificate Analysis:</strong> Verifies HTTPS encryption and examines certificate age and validity</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-blue-600 font-bold mt-1">•</span>
+              <span><strong>Domain Age & WHOIS:</strong> Identifies newly registered domains often used in phishing campaigns</span>
+            </li>
+          </ul>
+        </div>
+      )
+    },
+    {
+      question: "How to identify URL phishing?",
+      answer: (
+        <div className="space-y-4">
+          <p>Learn to identify suspicious links before clicking:</p>
+          <ul className="space-y-2 ml-6">
+            <li className="flex items-start gap-2">
+              <span className="text-blue-600 font-bold mt-1">•</span>
+              <span><strong>Misspelled domains:</strong> paypa1.com instead of paypal.com, or micr0soft.com instead of microsoft.com</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-blue-600 font-bold mt-1">•</span>
+              <span><strong>Suspicious subdomains:</strong> paypal-secure.suspicious-site.com (the real domain is suspicious-site.com)</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-blue-600 font-bold mt-1">•</span>
+              <span><strong>No HTTPS:</strong> Legitimate sites handling sensitive information always use HTTPS encryption</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-blue-600 font-bold mt-1">•</span>
+              <span><strong>Shortened URLs:</strong> Bit.ly, TinyURL, or similar services that hide the real destination</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-blue-600 font-bold mt-1">•</span>
+              <span><strong>Unusual urgency:</strong> "Verify your account immediately or it will be closed"</span>
+            </li>
+          </ul>
+          <p>Modern phishing attacks have become increasingly sophisticated, with threats like <a href="https://sendmarc.com/blog/spear-phishing-vs-phishing/" className="text-blue-600 hover:text-blue-700 font-medium underline hover:no-underline transition-all" target="_blank" rel="noopener noreferrer">spear phishing</a> targeting specific individuals.</p>
+        </div>
+      )
+    },
+    {
+      question: "How to check link safety with Sendmarc?",
+      answer: (
+        <div className="space-y-4">
+          <p>Checking link safety with Sendmarc's phishing checker is simple and instant:</p>
+          <ol className="space-y-3 ml-6">
+            <li className="flex items-start gap-3">
+              <span className="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-bold">1</span>
+              <span><strong>Paste the URL or email content</strong> into the text area above</span>
+            </li>
+            <li className="flex items-start gap-3">
+              <span className="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-bold">2</span>
+              <span><strong>Click "Analyze URLs"</strong> to start the scan</span>
+            </li>
+            <li className="flex items-start gap-3">
+              <span className="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-bold">3</span>
+              <span><strong>Review the results</strong> showing threat detection from multiple security engines</span>
+            </li>
+          </ol>
+          <p>The tool automatically extracts all URLs from the pasted content and analyzes each one for potential threats.</p>
+        </div>
+      )
+    },
+    {
+      question: "What does a \"CLEAN\" verdict mean?",
+      answer: (
+        <div className="space-y-4">
+          <p>A <strong className="text-green-600">CLEAN</strong> verdict indicates that:</p>
+          <ul className="space-y-2 ml-6">
+            <li className="flex items-start gap-2">
+              <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+              <span>No security engines detected threats or malicious content</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+              <span>The domain has proper SSL encryption (HTTPS)</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+              <span>No suspicious characteristics were found</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+              <span>The link appears safe to visit</span>
+            </li>
+          </ul>
+          <p className="text-sm text-gray-600 italic">Note: While a CLEAN verdict is a good sign, always exercise caution when clicking links from unknown sources.</p>
+        </div>
+      )
+    },
+    {
+      question: "What does a \"SUSPICIOUS\" verdict mean?",
+      answer: (
+        <div className="space-y-4">
+          <p>A <strong className="text-red-600">SUSPICIOUS</strong> verdict means the URL has been flagged and you should <strong>NOT click it</strong>. This happens when:</p>
+          <ul className="space-y-2 ml-6">
+            <li className="flex items-start gap-2">
+              <AlertTriangle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+              <span>One or more security engines detected the URL as malicious or phishing</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <AlertTriangle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+              <span>The domain is very new (registered recently), often used in phishing campaigns</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <AlertTriangle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+              <span>The site lacks HTTPS encryption</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <AlertTriangle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+              <span>The URL matches known phishing patterns</span>
+            </li>
+          </ul>
+          <p className="bg-red-50 border border-red-200 rounded-lg p-3 text-sm">
+            <strong>⚠️ If you find a suspicious link:</strong> Do not click it, delete the message, and report it to your IT security team or the impersonated organization.
+          </p>
+        </div>
+      )
+    },
+    {
+      question: "How can email authentication prevent phishing attacks?",
+      answer: (
+        <div className="space-y-4">
+          <p>Email authentication protocols are critical defenses against phishing and email spoofing:</p>
+          <ul className="space-y-3 ml-6">
+            <li className="flex items-start gap-2">
+              <Shield className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+              <span>
+                <strong>
+                  <a href="https://sendmarc.com/dmarc/" className="text-blue-600 hover:text-blue-700 underline hover:no-underline transition-all" target="_blank" rel="noopener noreferrer">
+                    DMARC
+                  </a>:
+                </strong> Tells email servers how to handle emails that fail authentication, preventing spoofed emails from reaching inboxes
+              </span>
+            </li>
+            <li className="flex items-start gap-2">
+              <Shield className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+              <span>
+                <strong>
+                  <a href="https://sendmarc.com/spf/" className="text-blue-600 hover:text-blue-700 underline hover:no-underline transition-all" target="_blank" rel="noopener noreferrer">
+                    SPF
+                  </a>:
+                </strong> Specifies which mail servers are authorized to send emails on behalf of your domain
+              </span>
+            </li>
+            <li className="flex items-start gap-2">
+              <Shield className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+              <span>
+                <strong>
+                  <a href="https://sendmarc.com/dkim/" className="text-blue-600 hover:text-blue-700 underline hover:no-underline transition-all" target="_blank" rel="noopener noreferrer">
+                    DKIM
+                  </a>:
+                </strong> Adds a digital signature to emails, verifying they haven't been tampered with in transit
+              </span>
+            </li>
+          </ul>
+          <p>Together, these protocols make it significantly harder for attackers to impersonate legitimate domains. Organizations using <a href="https://www.sendmarc.com" className="text-blue-600 hover:text-blue-700 font-medium underline hover:no-underline transition-all" target="_blank" rel="noopener noreferrer">DMARC enforcement</a> can block up to 99% of email-based phishing attacks.</p>
+        </div>
+      )
+    }
+  ];
 
   const extractUrls = (text: string): string[] => {
     const urlRegex = /(https?:\/\/[^\s<>"{}|\\^`\[\]]+|(?:www\.)?[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[a-zA-Z]{2,}(?:\/[^\s<>"{}|\\^`\[\]]*)?)/gi;
@@ -614,247 +799,156 @@ export default function Home() {
         </div>
       </main>
 
-      {/* Educational Content / FAQ Section */}
+      {/* FAQ Section with Dropdowns */}
       <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="bg-white rounded-2xl border border-gray-200/60 shadow-xl p-8 md:p-12">
-          <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-bold text-gray-900 mb-3">
             Frequently Asked Questions
           </h2>
+          <p className="text-gray-600">Have more questions? <a href="https://www.sendmarc.com/contact" className="text-blue-600 hover:text-blue-700 font-medium">Contact Us</a></p>
+        </div>
 
-          <div className="space-y-8">
-            {/* FAQ 1 */}
-            <div className="pb-8 border-b border-gray-100 last:border-0">
-              <h3 className="text-xl font-semibold text-gray-900 mb-3 flex items-start gap-2">
-                <div className="w-6 h-6 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <span className="text-xs font-bold text-blue-600">1</span>
+        <div className="space-y-3">
+          {faqs.map((faq, index) => (
+            <div
+              key={index}
+              className="bg-white rounded-xl border border-gray-200/60 shadow-sm hover:shadow-md transition-all duration-200"
+            >
+              <button
+                onClick={() => setOpenFaqIndex(openFaqIndex === index ? null : index)}
+                className="w-full flex items-center justify-between p-6 text-left hover:bg-gray-50/50 transition-colors rounded-xl"
+              >
+                <span className="font-semibold text-gray-900 text-lg pr-4">{faq.question}</span>
+                <ChevronDown
+                  className={`w-5 h-5 text-gray-600 flex-shrink-0 transition-transform duration-200 ${
+                    openFaqIndex === index ? 'rotate-180' : ''
+                  }`}
+                />
+              </button>
+              {openFaqIndex === index && (
+                <div className="px-6 pb-6 text-gray-700 leading-relaxed animate-in fade-in slide-in-from-top-2 duration-200">
+                  {faq.answer}
                 </div>
-                What is phishing and how does it work?
-              </h3>
-              <p className="text-gray-700 leading-relaxed mb-3 ml-8">
-                Phishing is a cyberattack where criminals impersonate legitimate organizations to steal sensitive information like passwords, credit card numbers, or personal data. Attackers send fraudulent emails, text messages, or create fake websites that appear authentic, tricking users into clicking malicious links or providing confidential information.
-              </p>
-              <p className="text-gray-700 leading-relaxed ml-8">
-                Modern phishing attacks have become increasingly sophisticated, with threats like{' '}
-                <a href="https://sendmarc.com/blog/spear-phishing-vs-phishing/" className="text-blue-600 hover:text-blue-700 font-medium underline hover:no-underline transition-all" target="_blank" rel="noopener noreferrer">
-                  spear phishing
-                </a>
-                {' '}targeting specific individuals and{' '}
-                <a href="https://sendmarc.com/blog/phishing-for-sale-the-telegram-threat-to-business-email-safety/" className="text-blue-600 hover:text-blue-700 font-medium underline hover:no-underline transition-all" target="_blank" rel="noopener noreferrer">
-                  phishing kits being sold on platforms like Telegram
-                </a>
-                , making these attacks more accessible to criminals.
-              </p>
+              )}
             </div>
-
-            {/* FAQ 2 */}
-            <div className="pb-8 border-b border-gray-100 last:border-0">
-              <h3 className="text-xl font-semibold text-gray-900 mb-3 flex items-start gap-2">
-                <div className="w-6 h-6 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <span className="text-xs font-bold text-blue-600">2</span>
-                </div>
-                How does this phishing URL checker work?
-              </h3>
-              <p className="text-gray-700 leading-relaxed mb-3 ml-8">
-                Our phishing checker analyzes URLs using multiple security layers to detect threats:
-              </p>
-              <ul className="space-y-2 text-gray-700 ml-14 mb-3">
-                <li className="flex items-start gap-2">
-                  <span className="text-blue-600 font-bold mt-1">•</span>
-                  <span><strong>VirusTotal:</strong> Scans URLs against 70+ antivirus engines and security databases to identify known malicious sites</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-blue-600 font-bold mt-1">•</span>
-                  <span><strong>Google Safe Browsing:</strong> Checks against Google's continuously updated database of unsafe web resources</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-blue-600 font-bold mt-1">•</span>
-                  <span><strong>SSL Certificate Analysis:</strong> Verifies HTTPS encryption and examines certificate age and validity</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-blue-600 font-bold mt-1">•</span>
-                  <span><strong>Domain Age & WHOIS:</strong> Identifies newly registered domains often used in phishing campaigns</span>
-                </li>
-              </ul>
-              <p className="text-gray-700 leading-relaxed ml-8">
-                You can paste individual URLs or entire email content, and our tool will automatically extract and analyze all links found.
-              </p>
-            </div>
-
-            {/* FAQ 3 */}
-            <div className="pb-8 border-b border-gray-100 last:border-0">
-              <h3 className="text-xl font-semibold text-gray-900 mb-3 flex items-start gap-2">
-                <div className="w-6 h-6 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <span className="text-xs font-bold text-blue-600">3</span>
-                </div>
-                How do I interpret the scan results?
-              </h3>
-              <p className="text-gray-700 leading-relaxed mb-3 ml-8">
-                The tool provides a clear verdict for each URL:
-              </p>
-              <ul className="space-y-3 text-gray-700 ml-14 mb-3">
-                <li className="flex items-start gap-2">
-                  <div className="w-5 h-5 bg-red-100 rounded flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <AlertTriangle className="w-3 h-3 text-red-600" />
-                  </div>
-                  <span><strong className="text-red-600">SUSPICIOUS:</strong> The URL has been flagged by one or more security engines, has concerning characteristics (like a very new domain or no HTTPS), or matches known phishing patterns. Do not click these links.</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <div className="w-5 h-5 bg-green-100 rounded flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <CheckCircle2 className="w-3 h-3 text-green-600" />
-                  </div>
-                  <span><strong className="text-green-600">CLEAN:</strong> No security engines detected threats, the domain has proper SSL encryption, and no suspicious characteristics were found. The link appears safe.</span>
-                </li>
-              </ul>
-              <p className="text-gray-700 leading-relaxed ml-8">
-                The VirusTotal results show how many security engines flagged the URL as malicious, suspicious, harmless, or undetected. Even a few detections can indicate a threat.
-              </p>
-            </div>
-
-            {/* FAQ 4 */}
-            <div className="pb-8 border-b border-gray-100 last:border-0">
-              <h3 className="text-xl font-semibold text-gray-900 mb-3 flex items-start gap-2">
-                <div className="w-6 h-6 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <span className="text-xs font-bold text-blue-600">4</span>
-                </div>
-                What are the warning signs of a phishing URL?
-              </h3>
-              <p className="text-gray-700 leading-relaxed mb-3 ml-8">
-                Learn to identify suspicious links before clicking:
-              </p>
-              <ul className="space-y-2 text-gray-700 ml-14">
-                <li className="flex items-start gap-2">
-                  <span className="text-blue-600 font-bold mt-1">•</span>
-                  <span><strong>Misspelled domains:</strong> paypa1.com instead of paypal.com, or micr0soft.com instead of microsoft.com</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-blue-600 font-bold mt-1">•</span>
-                  <span><strong>Suspicious subdomains:</strong> paypal-secure.suspicious-site.com (the real domain is suspicious-site.com)</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-blue-600 font-bold mt-1">•</span>
-                  <span><strong>No HTTPS:</strong> Legitimate sites handling sensitive information always use HTTPS encryption</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-blue-600 font-bold mt-1">•</span>
-                  <span><strong>Shortened URLs:</strong> Bit.ly, TinyURL, or similar services that hide the real destination</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-blue-600 font-bold mt-1">•</span>
-                  <span><strong>Unusual urgency:</strong> "Verify your account immediately or it will be closed"</span>
-                </li>
-              </ul>
-            </div>
-
-            {/* FAQ 5 */}
-            <div className="pb-8 border-b border-gray-100 last:border-0">
-              <h3 className="text-xl font-semibold text-gray-900 mb-3 flex items-start gap-2">
-                <div className="w-6 h-6 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <span className="text-xs font-bold text-blue-600">5</span>
-                </div>
-                How can email authentication prevent phishing attacks?
-              </h3>
-              <p className="text-gray-700 leading-relaxed mb-3 ml-8">
-                Email authentication protocols are critical defenses against phishing and email spoofing:
-              </p>
-              <ul className="space-y-2 text-gray-700 ml-14 mb-3">
-                <li className="flex items-start gap-2">
-                  <span className="text-blue-600 font-bold mt-1">•</span>
-                  <span>
-                    <strong>
-                      <a href="https://sendmarc.com/dmarc/" className="text-blue-600 hover:text-blue-700 underline hover:no-underline transition-all" target="_blank" rel="noopener noreferrer">
-                        DMARC
-                      </a>
-                      :
-                    </strong> Tells email servers how to handle emails that fail authentication, preventing spoofed emails from reaching inboxes
-                  </span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-blue-600 font-bold mt-1">•</span>
-                  <span>
-                    <strong>
-                      <a href="https://sendmarc.com/spf/" className="text-blue-600 hover:text-blue-700 underline hover:no-underline transition-all" target="_blank" rel="noopener noreferrer">
-                        SPF
-                      </a>
-                      :
-                    </strong> Specifies which mail servers are authorized to send emails on behalf of your domain
-                  </span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-blue-600 font-bold mt-1">•</span>
-                  <span>
-                    <strong>
-                      <a href="https://sendmarc.com/dkim/" className="text-blue-600 hover:text-blue-700 underline hover:no-underline transition-all" target="_blank" rel="noopener noreferrer">
-                        DKIM
-                      </a>
-                      :
-                    </strong> Adds a digital signature to emails, verifying they haven't been tampered with in transit
-                  </span>
-                </li>
-              </ul>
-              <p className="text-gray-700 leading-relaxed ml-8">
-                Together, these protocols make it significantly harder for attackers to impersonate legitimate domains. Organizations using{' '}
-                <a href="https://www.sendmarc.com" className="text-blue-600 hover:text-blue-700 font-medium underline hover:no-underline transition-all" target="_blank" rel="noopener noreferrer">
-                  DMARC enforcement
-                </a>
-                {' '}can block up to 99% of email-based phishing attacks.
-              </p>
-            </div>
-
-            {/* FAQ 6 */}
-            <div className="pb-8 border-b border-gray-100 last:border-0">
-              <h3 className="text-xl font-semibold text-gray-900 mb-3 flex items-start gap-2">
-                <div className="w-6 h-6 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <span className="text-xs font-bold text-blue-600">6</span>
-                </div>
-                What should I do if I find a suspicious link?
-              </h3>
-              <p className="text-gray-700 leading-relaxed mb-3 ml-8">
-                If our tool identifies a URL as suspicious, or if you have any doubts:
-              </p>
-              <ul className="space-y-2 text-gray-700 ml-14 mb-3">
-                <li className="flex items-start gap-2">
-                  <span className="text-blue-600 font-bold mt-1">•</span>
-                  <span><strong>Do not click the link</strong> - Even visiting a malicious site can compromise your security</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-blue-600 font-bold mt-1">•</span>
-                  <span><strong>Delete the email or message</strong> - Do not forward it to others</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-blue-600 font-bold mt-1">•</span>
-                  <span><strong>Report it</strong> - Forward phishing emails to your IT security team or report it to the impersonated organization</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-blue-600 font-bold mt-1">•</span>
-                  <span><strong>Verify directly</strong> - If the email claims to be from your bank or a service you use, contact them directly using official contact information (not from the suspicious email)</span>
-                </li>
-              </ul>
-              <p className="text-gray-700 leading-relaxed ml-8">
-                Learn more about{' '}
-                <a href="https://sendmarc.com/blog/changing-user-behaviour-to-prevent-phishing-attacks/" className="text-blue-600 hover:text-blue-700 font-medium underline hover:no-underline transition-all" target="_blank" rel="noopener noreferrer">
-                  behavioral changes that prevent phishing attacks
-                </a>
-                {' '}and protect your organization.
-              </p>
-            </div>
-          </div>
+          ))}
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-gray-200/50 py-8 bg-white/50 backdrop-blur-sm">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <p className="text-sm text-gray-600">
-            Powered by{' '}
-            <a
-              href="https://www.sendmarc.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-600 hover:text-blue-700 font-medium transition-colors"
-            >
-              Sendmarc
-            </a>
-          </p>
+      {/* Professional Footer */}
+      <footer className="bg-gray-900 text-gray-300 pt-16 pb-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+            {/* Company Info */}
+            <div>
+              <Image
+                src="https://help.sendmarc.com/hubfs/Sendmarc-Logo-RGB-Main.jpg"
+                alt="Sendmarc"
+                width={140}
+                height={36}
+                className="h-8 w-auto mb-6 brightness-0 invert"
+              />
+              <p className="text-sm text-gray-400 mb-4">
+                Protect your domain and email infrastructure with DMARC, SPF, and DKIM authentication.
+              </p>
+              <div className="space-y-2 text-sm">
+                <a href="mailto:info@sendmarc.com" className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors">
+                  <Mail className="w-4 h-4" />
+                  info@sendmarc.com
+                </a>
+                <a href="tel:+27109000972" className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors">
+                  <Phone className="w-4 h-4" />
+                  +27 10 900 0972
+                </a>
+              </div>
+            </div>
+
+            {/* Security Tools */}
+            <div>
+              <h3 className="font-semibold text-white mb-4">Security Tools</h3>
+              <ul className="space-y-2 text-sm">
+                <li>
+                  <a href="https://tools.sendmarc.com/phishing-checker" className="text-gray-400 hover:text-white transition-colors flex items-center gap-1">
+                    Phishing URL Checker
+                  </a>
+                </li>
+                <li>
+                  <a href="https://sendmarc.com/spf/" className="text-gray-400 hover:text-white transition-colors flex items-center gap-1">
+                    SPF Record Checker <ExternalLink className="w-3 h-3" />
+                  </a>
+                </li>
+                <li>
+                  <a href="https://sendmarc.com/dkim/" className="text-gray-400 hover:text-white transition-colors flex items-center gap-1">
+                    DKIM Record Checker <ExternalLink className="w-3 h-3" />
+                  </a>
+                </li>
+                <li>
+                  <a href="https://sendmarc.com/dmarc/" className="text-gray-400 hover:text-white transition-colors flex items-center gap-1">
+                    DMARC Analyzer <ExternalLink className="w-3 h-3" />
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            {/* Resources */}
+            <div>
+              <h3 className="font-semibold text-white mb-4">Resources</h3>
+              <ul className="space-y-2 text-sm">
+                <li>
+                  <a href="https://sendmarc.com/blog/" className="text-gray-400 hover:text-white transition-colors flex items-center gap-1">
+                    Blog <ExternalLink className="w-3 h-3" />
+                  </a>
+                </li>
+                <li>
+                  <a href="https://sendmarc.com/blog/spear-phishing-vs-phishing/" className="text-gray-400 hover:text-white transition-colors flex items-center gap-1">
+                    Phishing Guide <ExternalLink className="w-3 h-3" />
+                  </a>
+                </li>
+                <li>
+                  <a href="https://help.sendmarc.com/" className="text-gray-400 hover:text-white transition-colors flex items-center gap-1">
+                    Knowledge Base <ExternalLink className="w-3 h-3" />
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            {/* Company */}
+            <div>
+              <h3 className="font-semibold text-white mb-4">Company</h3>
+              <ul className="space-y-2 text-sm">
+                <li>
+                  <a href="https://www.sendmarc.com" className="text-gray-400 hover:text-white transition-colors flex items-center gap-1">
+                    About Sendmarc <ExternalLink className="w-3 h-3" />
+                  </a>
+                </li>
+                <li>
+                  <a href="https://www.sendmarc.com/contact" className="text-gray-400 hover:text-white transition-colors flex items-center gap-1">
+                    Contact Us <ExternalLink className="w-3 h-3" />
+                  </a>
+                </li>
+                <li>
+                  <a href="https://www.sendmarc.com/privacy" className="text-gray-400 hover:text-white transition-colors flex items-center gap-1">
+                    Privacy Policy <ExternalLink className="w-3 h-3" />
+                  </a>
+                </li>
+                <li>
+                  <a href="https://trust.sendmarc.com" className="text-gray-400 hover:text-white transition-colors flex items-center gap-1">
+                    Trust Center <ExternalLink className="w-3 h-3" />
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Bottom Bar */}
+          <div className="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+            <p className="text-sm text-gray-400">
+              © {new Date().getFullYear()} Sendmarc. All rights reserved.
+            </p>
+            <p className="text-sm text-gray-400">
+              Powered by <a href="https://www.sendmarc.com" className="text-white hover:text-blue-400 transition-colors">Sendmarc</a>
+            </p>
+          </div>
         </div>
       </footer>
     </div>
