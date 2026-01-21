@@ -355,17 +355,19 @@ export default function Home() {
       <header className="bg-white/80 backdrop-blur-md border-b border-gray-200/50 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center gap-3">
-            <Image
-              src="https://help.sendmarc.com/hubfs/Sendmarc-Logo-RGB-Main.jpg"
-              alt="Sendmarc"
-              width={140}
-              height={36}
-              className="h-8 w-auto"
-            />
-            <div className="h-6 w-px bg-gradient-to-b from-gray-300 to-transparent"></div>
-            <h1 className="text-lg font-semibold text-gray-900">
-              Phishing URL Checker
-            </h1>
+            <a href="https://www.sendmarc.com" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+              <Image
+                src="https://help.sendmarc.com/hubfs/Sendmarc-Logo-RGB-Main.jpg"
+                alt="Sendmarc"
+                width={140}
+                height={36}
+                className="h-8 w-auto"
+              />
+              <div className="h-6 w-px bg-gradient-to-b from-gray-300 to-transparent"></div>
+              <h1 className="text-lg font-semibold text-gray-900">
+                Phishing URL Checker
+              </h1>
+            </a>
           </div>
         </div>
       </header>
@@ -837,13 +839,9 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
             {/* Company Info */}
             <div>
-              <Image
-                src="https://i0.wp.com/ekoparty.org/wp-content/uploads/2024/10/Sendmarc-Logo-RGB-Main-Inverted-1.png?ssl=1"
-                alt="Sendmarc"
-                width={140}
-                height={36}
-                className="h-8 w-auto mb-6"
-              />
+              <div className="mb-6">
+                <span className="text-white text-2xl font-bold tracking-tight">Sendmarc</span>
+              </div>
               <p className="text-sm text-gray-400 mb-4">
                 Protect your domain and email infrastructure with DMARC, SPF, and DKIM authentication.
               </p>
