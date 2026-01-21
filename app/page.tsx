@@ -1,7 +1,20 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Image from 'next/image';
+import {
+  Shield,
+  AlertTriangle,
+  CheckCircle2,
+  Lock,
+  Globe,
+  ChevronRight,
+  ChevronDown,
+  Search,
+  Loader2,
+  XCircle,
+  Info
+} from 'lucide-react';
 
 interface CheckResult {
   url: string;
@@ -39,12 +52,10 @@ export default function Home() {
   const [lastSubmitTime, setLastSubmitTime] = useState<number>(0);
 
   const extractUrls = (text: string): string[] => {
-    // Match URLs with or without protocol
     const urlRegex = /(https?:\/\/[^\s<>"{}|\\^`\[\]]+|(?:www\.)?[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[a-zA-Z]{2,}(?:\/[^\s<>"{}|\\^`\[\]]*)?)/gi;
     const matches = text.match(urlRegex);
     if (!matches) return [];
 
-    // Normalize URLs and remove duplicates
     const normalized = matches.map(url => {
       if (!url.startsWith('http://') && !url.startsWith('https://')) {
         return `https://${url}`;
@@ -57,15 +68,12 @@ export default function Home() {
 
   const isValidUrl = (urlString: string): boolean => {
     try {
-      // Add protocol if missing
       const urlToValidate = urlString.startsWith('http') ? urlString : `https://${urlString}`;
       const url = new URL(urlToValidate);
 
-      // Check if it has a proper domain (at least domain.tld format)
       const hostname = url.hostname;
       const parts = hostname.split('.');
 
-      // Must have at least 2 parts (domain.tld) and the TLD should be at least 2 chars
       return parts.length >= 2 && parts[parts.length - 1].length >= 2 && hostname.length > 3;
     } catch {
       return false;
@@ -75,10 +83,9 @@ export default function Home() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Rate limiting check
     const now = Date.now();
     const timeSinceLastSubmit = now - lastSubmitTime;
-    const minDelay = 10000; // 10 seconds
+    const minDelay = 10000;
 
     if (timeSinceLastSubmit < minDelay && lastSubmitTime !== 0) {
       const remainingTime = Math.ceil((minDelay - timeSinceLastSubmit) / 1000);
@@ -145,7 +152,7 @@ export default function Home() {
         setMultiResult({
           urls,
           results,
-          totalUrls: urls.length,
+          totalUrls: results.length,
           suspiciousCount: suspicious,
           cleanCount: clean,
         });
@@ -158,9 +165,9 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200">
+      <header className="bg-white/80 backdrop-blur-md border-b border-gray-200/50 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center gap-3">
             <Image
@@ -170,64 +177,99 @@ export default function Home() {
               height={36}
               className="h-8 w-auto"
             />
-            <div className="h-6 w-px bg-gray-300"></div>
-            <h1 className="text-base font-semibold text-gray-900">Phishing URL Checker</h1>
+            <div className="h-6 w-px bg-gradient-to-b from-gray-300 to-transparent"></div>
+            <h1 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+              <Shield className="w-5 h-5 text-blue-600" />
+              Phishing URL Checker
+            </h1>
           </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 py-12">
-        <div className="w-full max-w-4xl">
+      <main className="flex-1 px-4 sm:px-6 lg:px-8 py-12">
+        <div className="w-full max-w-5xl mx-auto">
           {/* Input Section - Only show when no results */}
           {!result && !multiResult && (
-            <div className="fade-in">
-              <div className="text-center mb-8">
-                <h2 className="text-3xl font-bold text-gray-900 mb-3">
+            <div className="space-y-8 fade-in">
+              <div className="text-center max-w-3xl mx-auto">
+                <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-2xl mb-6">
+                  <Search className="w-8 h-8 text-blue-600" />
+                </div>
+                <h2 className="text-4xl font-bold text-gray-900 mb-4">
                   Analyze URLs for Security Threats
                 </h2>
-                <p className="text-gray-600 text-lg">
-                  Paste a URL or entire email content to check for phishing and malware
+                <p className="text-lg text-gray-600">
+                  Paste any URL or entire email content to instantly check for phishing, malware, and security risks
                 </p>
               </div>
 
-              <div className="bg-white rounded-xl border border-gray-200 shadow-lg p-8">
+              <div className="bg-white rounded-2xl border border-gray-200/60 shadow-xl shadow-gray-200/50 p-8 hover:shadow-2xl hover:shadow-gray-300/50 transition-all duration-300">
                 <form onSubmit={handleSubmit} className="space-y-5">
-                  <textarea
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    placeholder="https://example.com or paste email content here..."
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-sm"
-                    rows={6}
-                    required
-                    disabled={loading}
-                  />
+                  <div className="relative">
+                    <textarea
+                      value={input}
+                      onChange={(e) => setInput(e.target.value)}
+                      placeholder="https://example.com or paste email content here..."
+                      className="w-full px-5 py-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-base bg-gray-50/50 hover:bg-gray-50 transition-colors duration-200"
+                      rows={6}
+                      required
+                      disabled={loading}
+                    />
+                  </div>
 
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3.5 px-6 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-base"
+                    className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-base shadow-lg shadow-blue-600/30 hover:shadow-xl hover:shadow-blue-600/40 flex items-center justify-center gap-2 group"
                   >
                     {loading ? (
-                      <span className="flex items-center justify-center gap-2">
-                        <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                        </svg>
+                      <>
+                        <Loader2 className="w-5 h-5 animate-spin" />
                         Analyzing...
-                      </span>
-                    ) : 'Analyze URLs'}
+                      </>
+                    ) : (
+                      <>
+                        <Shield className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                        Analyze URLs
+                      </>
+                    )}
                   </button>
                 </form>
 
                 {error && (
-                  <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-start gap-2">
-                    <svg className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                    </svg>
-                    <p className="text-sm text-red-800">{error}</p>
+                  <div className="mt-5 p-4 bg-red-50 border border-red-200 rounded-xl flex items-start gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
+                    <XCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                    <p className="text-sm text-red-800 font-medium">{error}</p>
                   </div>
                 )}
+              </div>
+
+              {/* Feature Highlights */}
+              <div className="grid md:grid-cols-3 gap-6 mt-12">
+                <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-gray-200/50 hover:bg-white hover:shadow-lg hover:border-blue-200 transition-all duration-300 group">
+                  <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-4 group-hover:bg-blue-600 transition-colors duration-300">
+                    <Shield className="w-6 h-6 text-blue-600 group-hover:text-white transition-colors duration-300" />
+                  </div>
+                  <h3 className="font-semibold text-gray-900 mb-2">Multi-Engine Scanning</h3>
+                  <p className="text-sm text-gray-600">Powered by VirusTotal's 70+ security engines and Google Safe Browsing</p>
+                </div>
+
+                <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-gray-200/50 hover:bg-white hover:shadow-lg hover:border-green-200 transition-all duration-300 group">
+                  <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mb-4 group-hover:bg-green-600 transition-colors duration-300">
+                    <Lock className="w-6 h-6 text-green-600 group-hover:text-white transition-colors duration-300" />
+                  </div>
+                  <h3 className="font-semibold text-gray-900 mb-2">SSL & Certificate Analysis</h3>
+                  <p className="text-sm text-gray-600">Verify HTTPS encryption and examine certificate validity</p>
+                </div>
+
+                <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-gray-200/50 hover:bg-white hover:shadow-lg hover:border-purple-200 transition-all duration-300 group">
+                  <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mb-4 group-hover:bg-purple-600 transition-colors duration-300">
+                    <Globe className="w-6 h-6 text-purple-600 group-hover:text-white transition-colors duration-300" />
+                  </div>
+                  <h3 className="font-semibold text-gray-900 mb-2">Domain Intelligence</h3>
+                  <p className="text-sm text-gray-600">Identify newly registered domains often used in phishing</p>
+                </div>
               </div>
             </div>
           )}
@@ -236,32 +278,28 @@ export default function Home() {
           {result && !loading && (
             <div className="space-y-6 fade-in">
               {/* Verdict Card */}
-              <div className={`rounded-xl border-2 shadow-lg p-8 ${
+              <div className={`rounded-2xl border-2 shadow-xl p-8 ${
                 result.verdict === 'SUSPICIOUS'
-                  ? 'bg-red-50 border-red-200'
-                  : 'bg-green-50 border-green-200'
+                  ? 'bg-gradient-to-br from-red-50 to-red-100/50 border-red-200'
+                  : 'bg-gradient-to-br from-green-50 to-green-100/50 border-green-200'
               }`}>
-                <div className="flex items-start gap-4">
-                  <div className={`flex-shrink-0 w-16 h-16 rounded-full flex items-center justify-center ${
-                    result.verdict === 'SUSPICIOUS' ? 'bg-red-100' : 'bg-green-100'
+                <div className="flex items-start gap-5">
+                  <div className={`flex-shrink-0 w-20 h-20 rounded-2xl flex items-center justify-center shadow-lg ${
+                    result.verdict === 'SUSPICIOUS' ? 'bg-red-500' : 'bg-green-500'
                   }`}>
                     {result.verdict === 'SUSPICIOUS' ? (
-                      <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                      </svg>
+                      <AlertTriangle className="w-10 h-10 text-white" />
                     ) : (
-                      <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
+                      <CheckCircle2 className="w-10 h-10 text-white" />
                     )}
                   </div>
                   <div className="flex-1">
-                    <h3 className={`text-2xl font-bold mb-2 ${
+                    <h3 className={`text-3xl font-bold mb-2 ${
                       result.verdict === 'SUSPICIOUS' ? 'text-red-900' : 'text-green-900'
                     }`}>
                       {result.verdict === 'SUSPICIOUS' ? 'Threat Detected' : 'No Threats Found'}
                     </h3>
-                    <p className={`text-base mb-3 ${
+                    <p className={`text-lg mb-4 ${
                       result.verdict === 'SUSPICIOUS' ? 'text-red-700' : 'text-green-700'
                     }`}>
                       {result.verdict === 'SUSPICIOUS'
@@ -271,11 +309,9 @@ export default function Home() {
                     {result.suspicionReasons && result.suspicionReasons.length > 0 && (
                       <ul className="space-y-2">
                         {result.suspicionReasons.map((reason, idx) => (
-                          <li key={idx} className="flex items-start gap-2 text-sm text-red-800">
-                            <svg className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                            </svg>
-                            <span>{reason}</span>
+                          <li key={idx} className="flex items-start gap-2 text-sm text-red-800 bg-white/50 rounded-lg p-3">
+                            <AlertTriangle className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
+                            <span className="font-medium">{reason}</span>
                           </li>
                         ))}
                       </ul>
@@ -288,50 +324,52 @@ export default function Home() {
               <div className="grid md:grid-cols-2 gap-6">
                 {/* VirusTotal */}
                 {result.checks.virustotal && !result.checks.virustotal.error && !result.checks.virustotal.status && (
-                  <div className="bg-white rounded-xl border border-gray-200 shadow-md p-6">
-                    <div className="flex items-center gap-2 mb-4">
-                      <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                      </svg>
-                      <h4 className="font-semibold text-gray-900 text-base">VirusTotal</h4>
+                  <div className="bg-white rounded-2xl border border-gray-200/60 shadow-lg p-6 hover:shadow-xl transition-all duration-300">
+                    <div className="flex items-center gap-3 mb-5">
+                      <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
+                        <Shield className="w-5 h-5 text-blue-600" />
+                      </div>
+                      <h4 className="font-semibold text-gray-900 text-lg">VirusTotal</h4>
                     </div>
                     <div className="grid grid-cols-4 gap-3">
-                      <div className="text-center p-4 bg-red-50 rounded-lg">
+                      <div className="text-center p-4 bg-gradient-to-br from-red-50 to-red-100 rounded-xl hover:scale-105 transition-transform duration-200">
                         <div className="text-2xl font-bold text-red-600">{result.checks.virustotal.malicious}</div>
                         <div className="text-xs text-gray-600 mt-1 font-medium">Malicious</div>
                       </div>
-                      <div className="text-center p-4 bg-orange-50 rounded-lg">
+                      <div className="text-center p-4 bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl hover:scale-105 transition-transform duration-200">
                         <div className="text-2xl font-bold text-orange-600">{result.checks.virustotal.suspicious}</div>
                         <div className="text-xs text-gray-600 mt-1 font-medium">Suspicious</div>
                       </div>
-                      <div className="text-center p-4 bg-green-50 rounded-lg">
+                      <div className="text-center p-4 bg-gradient-to-br from-green-50 to-green-100 rounded-xl hover:scale-105 transition-transform duration-200">
                         <div className="text-2xl font-bold text-green-600">{result.checks.virustotal.harmless}</div>
                         <div className="text-xs text-gray-600 mt-1 font-medium">Clean</div>
                       </div>
-                      <div className="text-center p-4 bg-gray-50 rounded-lg">
+                      <div className="text-center p-4 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl hover:scale-105 transition-transform duration-200">
                         <div className="text-2xl font-bold text-gray-600">{result.checks.virustotal.undetected}</div>
                         <div className="text-xs text-gray-600 mt-1 font-medium">Undetected</div>
                       </div>
                     </div>
 
                     {result.checks.virustotal.detections && result.checks.virustotal.detections.length > 0 && (
-                      <div className="mt-4">
+                      <div className="mt-5">
                         <button
                           onClick={() => setShowDetections(!showDetections)}
-                          className="text-sm text-blue-600 hover:text-blue-700 font-semibold flex items-center gap-2"
+                          className="text-sm text-blue-600 hover:text-blue-700 font-semibold flex items-center gap-2 hover:gap-3 transition-all duration-200"
                         >
-                          <svg className={`w-4 h-4 transition-transform duration-200 ${showDetections ? 'rotate-90' : ''}`} fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
-                          </svg>
+                          {showDetections ? (
+                            <ChevronDown className="w-4 h-4" />
+                          ) : (
+                            <ChevronRight className="w-4 h-4" />
+                          )}
                           {showDetections ? 'Hide' : 'Show'} {result.checks.virustotal.detections.length} engine detections
                         </button>
 
                         {showDetections && (
-                          <div className="mt-3 max-h-48 overflow-y-auto border border-gray-200 rounded-lg bg-gray-50">
+                          <div className="mt-3 max-h-64 overflow-y-auto border border-gray-200 rounded-xl bg-gray-50">
                             {result.checks.virustotal.detections.map((detection: any, idx: number) => (
-                              <div key={idx} className="flex justify-between items-center px-3 py-2 border-b border-gray-200 last:border-0 text-sm hover:bg-white transition-colors">
+                              <div key={idx} className="flex justify-between items-center px-4 py-3 border-b border-gray-200 last:border-0 text-sm hover:bg-white transition-colors">
                                 <span className="font-semibold text-gray-800">{detection.engine}</span>
-                                <span className={`px-2.5 py-1 rounded-md text-xs font-semibold ${
+                                <span className={`px-3 py-1 rounded-lg text-xs font-semibold ${
                                   detection.category === 'malicious' ? 'bg-red-100 text-red-700' : 'bg-orange-100 text-orange-700'
                                 }`}>
                                   {detection.result}
@@ -347,18 +385,20 @@ export default function Home() {
 
                 {/* Google Safe Browsing */}
                 {result.checks.safeBrowsing && !result.checks.safeBrowsing.error && (
-                  <div className="bg-white rounded-xl border border-gray-200 shadow-md p-6">
-                    <div className="flex items-center gap-2 mb-4">
-                      <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
-                      </svg>
-                      <h4 className="font-semibold text-gray-900 text-base">Google Safe Browsing</h4>
+                  <div className="bg-white rounded-2xl border border-gray-200/60 shadow-lg p-6 hover:shadow-xl transition-all duration-300">
+                    <div className="flex items-center gap-3 mb-5">
+                      <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
+                        <Globe className="w-5 h-5 text-green-600" />
+                      </div>
+                      <h4 className="font-semibold text-gray-900 text-lg">Google Safe Browsing</h4>
                     </div>
-                    <div className={`flex items-center gap-2 ${result.checks.safeBrowsing.safe ? 'text-green-700' : 'text-red-700'}`}>
-                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                      </svg>
-                      <span className="text-sm font-semibold">
+                    <div className={`flex items-center gap-3 p-4 rounded-xl ${result.checks.safeBrowsing.safe ? 'bg-green-50' : 'bg-red-50'}`}>
+                      {result.checks.safeBrowsing.safe ? (
+                        <CheckCircle2 className="w-6 h-6 text-green-600" />
+                      ) : (
+                        <AlertTriangle className="w-6 h-6 text-red-600" />
+                      )}
+                      <span className={`text-base font-semibold ${result.checks.safeBrowsing.safe ? 'text-green-700' : 'text-red-700'}`}>
                         {result.checks.safeBrowsing.safe ? 'No threats detected' : 'Threats detected'}
                       </span>
                     </div>
@@ -367,27 +407,34 @@ export default function Home() {
 
                 {/* SSL Certificate */}
                 {result.checks.ssl && (
-                  <div className="bg-white rounded-xl border border-gray-200 shadow-md p-6">
-                    <div className="flex items-center gap-2 mb-4">
-                      <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                      </svg>
-                      <h4 className="font-semibold text-gray-900 text-base">SSL Certificate</h4>
+                  <div className="bg-white rounded-2xl border border-gray-200/60 shadow-lg p-6 hover:shadow-xl transition-all duration-300">
+                    <div className="flex items-center gap-3 mb-5">
+                      <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center">
+                        <Lock className="w-5 h-5 text-purple-600" />
+                      </div>
+                      <h4 className="font-semibold text-gray-900 text-lg">SSL Certificate</h4>
                     </div>
-                    <div className="space-y-2 text-sm">
-                      <div className={`flex items-center gap-2 ${result.checks.ssl.secure ? 'text-green-700' : 'text-orange-700'}`}>
-                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                        </svg>
-                        <span className="font-semibold">
+                    <div className="space-y-3">
+                      <div className={`flex items-center gap-3 p-3 rounded-xl ${result.checks.ssl.secure ? 'bg-green-50' : 'bg-orange-50'}`}>
+                        <Lock className={`w-5 h-5 ${result.checks.ssl.secure ? 'text-green-600' : 'text-orange-600'}`} />
+                        <span className={`text-sm font-semibold ${result.checks.ssl.secure ? 'text-green-700' : 'text-orange-700'}`}>
                           {result.checks.ssl.secure ? 'Secure HTTPS' : 'Insecure HTTP'}
                         </span>
                       </div>
                       {result.checks.ssl.certificate && !result.checks.ssl.certificate.error && (
-                        <div className="pl-6 space-y-1 text-gray-600">
-                          <div><span className="font-semibold">Issuer:</span> {result.checks.ssl.certificate.issuer}</div>
-                          <div><span className="font-semibold">Age:</span> {result.checks.ssl.certificate.certAge} days</div>
-                          <div><span className="font-semibold">Expires:</span> {result.checks.ssl.certificate.daysUntilExpiry} days</div>
+                        <div className="space-y-2 text-sm bg-gray-50 rounded-xl p-4">
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Issuer:</span>
+                            <span className="font-medium text-gray-900">{result.checks.ssl.certificate.issuer}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Age:</span>
+                            <span className="font-medium text-gray-900">{result.checks.ssl.certificate.certAge} days</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Expires:</span>
+                            <span className="font-medium text-gray-900">{result.checks.ssl.certificate.daysUntilExpiry} days</span>
+                          </div>
                         </div>
                       )}
                     </div>
@@ -396,25 +443,34 @@ export default function Home() {
 
                 {/* Domain Info */}
                 {result.checks.whois && !result.checks.whois.error && (
-                  <div className="bg-white rounded-xl border border-gray-200 shadow-md p-6">
-                    <div className="flex items-center gap-2 mb-4">
-                      <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
-                      </svg>
-                      <h4 className="font-semibold text-gray-900 text-base">Domain Information</h4>
+                  <div className="bg-white rounded-2xl border border-gray-200/60 shadow-lg p-6 hover:shadow-xl transition-all duration-300">
+                    <div className="flex items-center gap-3 mb-5">
+                      <div className="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center">
+                        <Info className="w-5 h-5 text-indigo-600" />
+                      </div>
+                      <h4 className="font-semibold text-gray-900 text-lg">Domain Information</h4>
                     </div>
-                    <div className="space-y-2 text-sm text-gray-600">
+                    <div className="space-y-2 text-sm bg-gray-50 rounded-xl p-4">
                       {result.checks.whois.domainAge !== null && result.checks.whois.domainAge !== undefined && (
-                        <div className={result.checks.whois.isNew ? 'text-red-700 font-semibold' : ''}>
-                          <span className="font-semibold">Age:</span> {result.checks.whois.domainAge} days
-                          {result.checks.whois.isNew && ' (NEW)'}
+                        <div className={`flex justify-between ${result.checks.whois.isNew ? 'text-red-700 font-semibold' : ''}`}>
+                          <span className="text-gray-600">Age:</span>
+                          <span className="font-medium text-gray-900">
+                            {result.checks.whois.domainAge} days
+                            {result.checks.whois.isNew && ' (NEW)'}
+                          </span>
                         </div>
                       )}
                       {result.checks.whois.registrar && (
-                        <div><span className="font-semibold">Registrar:</span> {result.checks.whois.registrar}</div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Registrar:</span>
+                          <span className="font-medium text-gray-900">{result.checks.whois.registrar}</span>
+                        </div>
                       )}
                       {result.checks.whois.createdDate && (
-                        <div><span className="font-semibold">Created:</span> {new Date(result.checks.whois.createdDate).toLocaleDateString()}</div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Created:</span>
+                          <span className="font-medium text-gray-900">{new Date(result.checks.whois.createdDate).toLocaleDateString()}</span>
+                        </div>
                       )}
                     </div>
                   </div>
@@ -422,7 +478,7 @@ export default function Home() {
               </div>
 
               {/* URL Display */}
-              <div className="bg-white rounded-xl border border-gray-200 shadow-md p-4">
+              <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-2xl border border-gray-200 p-5">
                 <p className="text-sm text-gray-600 font-mono break-all">{result.url}</p>
               </div>
 
@@ -433,11 +489,9 @@ export default function Home() {
                     setResult(null);
                     setInput('');
                   }}
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-lg transition-colors duration-200"
+                  className="inline-flex items-center gap-2 px-8 py-3 bg-white hover:bg-gray-50 text-gray-700 font-semibold rounded-xl transition-all duration-200 border border-gray-200 shadow-lg hover:shadow-xl group"
                 >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                  </svg>
+                  <ChevronRight className="w-4 h-4 rotate-180 group-hover:-translate-x-1 transition-transform" />
                   Check Another URL
                 </button>
               </div>
@@ -448,27 +502,25 @@ export default function Home() {
           {multiResult && !loading && (
             <div className="space-y-6 fade-in">
               {/* Summary */}
-              <div className="bg-white rounded-xl border border-gray-200 shadow-lg p-8">
+              <div className="bg-white rounded-2xl border border-gray-200/60 shadow-xl p-8">
                 <h3 className="text-2xl font-bold text-gray-900 mb-6">Scan Results</h3>
                 <div className="grid grid-cols-3 gap-6 mb-6">
-                  <div className="text-center p-6 bg-gray-50 rounded-xl">
-                    <div className="text-4xl font-bold text-gray-900">{multiResult.totalUrls}</div>
+                  <div className="text-center p-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl hover:scale-105 transition-transform duration-200">
+                    <div className="text-5xl font-bold text-gray-900">{multiResult.totalUrls}</div>
                     <div className="text-sm text-gray-600 mt-2 font-medium">Total URLs</div>
                   </div>
-                  <div className="text-center p-6 bg-red-50 rounded-xl">
-                    <div className="text-4xl font-bold text-red-600">{multiResult.suspiciousCount}</div>
+                  <div className="text-center p-6 bg-gradient-to-br from-red-50 to-red-100 rounded-2xl hover:scale-105 transition-transform duration-200">
+                    <div className="text-5xl font-bold text-red-600">{multiResult.suspiciousCount}</div>
                     <div className="text-sm text-gray-600 mt-2 font-medium">Suspicious</div>
                   </div>
-                  <div className="text-center p-6 bg-green-50 rounded-xl">
-                    <div className="text-4xl font-bold text-green-600">{multiResult.cleanCount}</div>
+                  <div className="text-center p-6 bg-gradient-to-br from-green-50 to-green-100 rounded-2xl hover:scale-105 transition-transform duration-200">
+                    <div className="text-5xl font-bold text-green-600">{multiResult.cleanCount}</div>
                     <div className="text-sm text-gray-600 mt-2 font-medium">Clean</div>
                   </div>
                 </div>
                 {multiResult.suspiciousCount > 0 && (
-                  <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-start gap-3">
-                    <svg className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                    </svg>
+                  <div className="bg-gradient-to-r from-red-50 to-red-100 border border-red-200 rounded-2xl p-4 flex items-start gap-3">
+                    <AlertTriangle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
                     <p className="text-sm text-red-800 font-semibold">Warning: Suspicious URLs detected. Do not click these links.</p>
                   </div>
                 )}
@@ -477,27 +529,23 @@ export default function Home() {
               {/* URL List */}
               <div className="space-y-4">
                 {multiResult.results.map((res, idx) => (
-                  <div key={idx} className={`bg-white rounded-xl border-2 shadow-md p-5 ${
+                  <div key={idx} className={`bg-white rounded-2xl border-2 shadow-lg p-6 hover:shadow-xl transition-all duration-300 ${
                     res.verdict === 'SUSPICIOUS' ? 'border-red-200' : 'border-green-200'
                   }`}>
                     <div className="flex items-start gap-4">
-                      <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${
-                        res.verdict === 'SUSPICIOUS' ? 'bg-red-100' : 'bg-green-100'
+                      <div className={`flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center shadow-md ${
+                        res.verdict === 'SUSPICIOUS' ? 'bg-red-500' : 'bg-green-500'
                       }`}>
                         {res.verdict === 'SUSPICIOUS' ? (
-                          <svg className="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                          </svg>
+                          <AlertTriangle className="w-6 h-6 text-white" />
                         ) : (
-                          <svg className="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                          </svg>
+                          <CheckCircle2 className="w-6 h-6 text-white" />
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-mono break-all text-gray-900 mb-3">{res.url}</p>
+                        <p className="text-sm font-mono break-all text-gray-900 mb-3 bg-gray-50 rounded-lg p-3">{res.url}</p>
                         <div className="flex items-center gap-2 mb-3">
-                          <span className={`px-3 py-1.5 rounded-lg text-xs font-bold ${
+                          <span className={`px-4 py-2 rounded-lg text-xs font-bold shadow-sm ${
                             res.verdict === 'SUSPICIOUS'
                               ? 'bg-red-100 text-red-700'
                               : 'bg-green-100 text-green-700'
@@ -508,8 +556,8 @@ export default function Home() {
                         {res.suspicionReasons && res.suspicionReasons.length > 0 && (
                           <ul className="space-y-1.5 text-xs text-gray-600 mb-3">
                             {res.suspicionReasons.map((reason, reasonIdx) => (
-                              <li key={reasonIdx} className="flex items-start gap-2">
-                                <span className="text-gray-400 font-bold">•</span>
+                              <li key={reasonIdx} className="flex items-start gap-2 bg-red-50/50 rounded-lg p-2">
+                                <AlertTriangle className="w-3 h-3 text-red-600 flex-shrink-0 mt-0.5" />
                                 <span>{reason}</span>
                               </li>
                             ))}
@@ -520,20 +568,22 @@ export default function Home() {
                           <div className="mt-3">
                             <button
                               onClick={() => setExpandedUrlIndex(expandedUrlIndex === idx ? null : idx)}
-                              className="text-sm text-blue-600 hover:text-blue-700 font-semibold flex items-center gap-2"
+                              className="text-sm text-blue-600 hover:text-blue-700 font-semibold flex items-center gap-2 hover:gap-3 transition-all duration-200"
                             >
-                              <svg className={`w-4 h-4 transition-transform duration-200 ${expandedUrlIndex === idx ? 'rotate-90' : ''}`} fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
-                              </svg>
+                              {expandedUrlIndex === idx ? (
+                                <ChevronDown className="w-4 h-4" />
+                              ) : (
+                                <ChevronRight className="w-4 h-4" />
+                              )}
                               {expandedUrlIndex === idx ? 'Hide' : 'Show'} {res.checks.virustotal.detections.length} engine detections
                             </button>
 
                             {expandedUrlIndex === idx && (
-                              <div className="mt-3 max-h-40 overflow-y-auto border border-gray-200 rounded-lg bg-gray-50">
+                              <div className="mt-3 max-h-48 overflow-y-auto border border-gray-200 rounded-xl bg-gray-50">
                                 {res.checks.virustotal.detections.map((detection: any, detIdx: number) => (
-                                  <div key={detIdx} className="flex justify-between items-center px-3 py-2 border-b border-gray-200 last:border-0 text-sm hover:bg-white transition-colors">
+                                  <div key={detIdx} className="flex justify-between items-center px-4 py-3 border-b border-gray-200 last:border-0 text-sm hover:bg-white transition-colors">
                                     <span className="font-semibold text-gray-800">{detection.engine}</span>
-                                    <span className="text-red-600 font-medium">{detection.result}</span>
+                                    <span className="text-red-600 font-medium px-3 py-1 bg-red-50 rounded-lg">{detection.result}</span>
                                   </div>
                                 ))}
                               </div>
@@ -547,17 +597,15 @@ export default function Home() {
               </div>
 
               {/* Back Button */}
-              <div className="text-center mt-8">
+              <div className="text-center">
                 <button
                   onClick={() => {
                     setMultiResult(null);
                     setInput('');
                   }}
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-lg transition-colors duration-200"
+                  className="inline-flex items-center gap-2 px-8 py-3 bg-white hover:bg-gray-50 text-gray-700 font-semibold rounded-xl transition-all duration-200 border border-gray-200 shadow-lg hover:shadow-xl group"
                 >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                  </svg>
+                  <ChevronRight className="w-4 h-4 rotate-180 group-hover:-translate-x-1 transition-transform" />
                   Check More URLs
                 </button>
               </div>
@@ -566,8 +614,235 @@ export default function Home() {
         </div>
       </main>
 
+      {/* Educational Content / FAQ Section */}
+      <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="bg-white rounded-2xl border border-gray-200/60 shadow-xl p-8 md:p-12">
+          <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
+            Frequently Asked Questions
+          </h2>
+
+          <div className="space-y-8">
+            {/* FAQ 1 */}
+            <div className="pb-8 border-b border-gray-100 last:border-0">
+              <h3 className="text-xl font-semibold text-gray-900 mb-3 flex items-start gap-2">
+                <div className="w-6 h-6 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <span className="text-xs font-bold text-blue-600">1</span>
+                </div>
+                What is phishing and how does it work?
+              </h3>
+              <p className="text-gray-700 leading-relaxed mb-3 ml-8">
+                Phishing is a cyberattack where criminals impersonate legitimate organizations to steal sensitive information like passwords, credit card numbers, or personal data. Attackers send fraudulent emails, text messages, or create fake websites that appear authentic, tricking users into clicking malicious links or providing confidential information.
+              </p>
+              <p className="text-gray-700 leading-relaxed ml-8">
+                Modern phishing attacks have become increasingly sophisticated, with threats like{' '}
+                <a href="https://sendmarc.com/blog/spear-phishing-vs-phishing/" className="text-blue-600 hover:text-blue-700 font-medium underline hover:no-underline transition-all" target="_blank" rel="noopener noreferrer">
+                  spear phishing
+                </a>
+                {' '}targeting specific individuals and{' '}
+                <a href="https://sendmarc.com/blog/phishing-for-sale-the-telegram-threat-to-business-email-safety/" className="text-blue-600 hover:text-blue-700 font-medium underline hover:no-underline transition-all" target="_blank" rel="noopener noreferrer">
+                  phishing kits being sold on platforms like Telegram
+                </a>
+                , making these attacks more accessible to criminals.
+              </p>
+            </div>
+
+            {/* FAQ 2 */}
+            <div className="pb-8 border-b border-gray-100 last:border-0">
+              <h3 className="text-xl font-semibold text-gray-900 mb-3 flex items-start gap-2">
+                <div className="w-6 h-6 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <span className="text-xs font-bold text-blue-600">2</span>
+                </div>
+                How does this phishing URL checker work?
+              </h3>
+              <p className="text-gray-700 leading-relaxed mb-3 ml-8">
+                Our phishing checker analyzes URLs using multiple security layers to detect threats:
+              </p>
+              <ul className="space-y-2 text-gray-700 ml-14 mb-3">
+                <li className="flex items-start gap-2">
+                  <span className="text-blue-600 font-bold mt-1">•</span>
+                  <span><strong>VirusTotal:</strong> Scans URLs against 70+ antivirus engines and security databases to identify known malicious sites</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-blue-600 font-bold mt-1">•</span>
+                  <span><strong>Google Safe Browsing:</strong> Checks against Google's continuously updated database of unsafe web resources</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-blue-600 font-bold mt-1">•</span>
+                  <span><strong>SSL Certificate Analysis:</strong> Verifies HTTPS encryption and examines certificate age and validity</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-blue-600 font-bold mt-1">•</span>
+                  <span><strong>Domain Age & WHOIS:</strong> Identifies newly registered domains often used in phishing campaigns</span>
+                </li>
+              </ul>
+              <p className="text-gray-700 leading-relaxed ml-8">
+                You can paste individual URLs or entire email content, and our tool will automatically extract and analyze all links found.
+              </p>
+            </div>
+
+            {/* FAQ 3 */}
+            <div className="pb-8 border-b border-gray-100 last:border-0">
+              <h3 className="text-xl font-semibold text-gray-900 mb-3 flex items-start gap-2">
+                <div className="w-6 h-6 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <span className="text-xs font-bold text-blue-600">3</span>
+                </div>
+                How do I interpret the scan results?
+              </h3>
+              <p className="text-gray-700 leading-relaxed mb-3 ml-8">
+                The tool provides a clear verdict for each URL:
+              </p>
+              <ul className="space-y-3 text-gray-700 ml-14 mb-3">
+                <li className="flex items-start gap-2">
+                  <div className="w-5 h-5 bg-red-100 rounded flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <AlertTriangle className="w-3 h-3 text-red-600" />
+                  </div>
+                  <span><strong className="text-red-600">SUSPICIOUS:</strong> The URL has been flagged by one or more security engines, has concerning characteristics (like a very new domain or no HTTPS), or matches known phishing patterns. Do not click these links.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <div className="w-5 h-5 bg-green-100 rounded flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <CheckCircle2 className="w-3 h-3 text-green-600" />
+                  </div>
+                  <span><strong className="text-green-600">CLEAN:</strong> No security engines detected threats, the domain has proper SSL encryption, and no suspicious characteristics were found. The link appears safe.</span>
+                </li>
+              </ul>
+              <p className="text-gray-700 leading-relaxed ml-8">
+                The VirusTotal results show how many security engines flagged the URL as malicious, suspicious, harmless, or undetected. Even a few detections can indicate a threat.
+              </p>
+            </div>
+
+            {/* FAQ 4 */}
+            <div className="pb-8 border-b border-gray-100 last:border-0">
+              <h3 className="text-xl font-semibold text-gray-900 mb-3 flex items-start gap-2">
+                <div className="w-6 h-6 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <span className="text-xs font-bold text-blue-600">4</span>
+                </div>
+                What are the warning signs of a phishing URL?
+              </h3>
+              <p className="text-gray-700 leading-relaxed mb-3 ml-8">
+                Learn to identify suspicious links before clicking:
+              </p>
+              <ul className="space-y-2 text-gray-700 ml-14">
+                <li className="flex items-start gap-2">
+                  <span className="text-blue-600 font-bold mt-1">•</span>
+                  <span><strong>Misspelled domains:</strong> paypa1.com instead of paypal.com, or micr0soft.com instead of microsoft.com</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-blue-600 font-bold mt-1">•</span>
+                  <span><strong>Suspicious subdomains:</strong> paypal-secure.suspicious-site.com (the real domain is suspicious-site.com)</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-blue-600 font-bold mt-1">•</span>
+                  <span><strong>No HTTPS:</strong> Legitimate sites handling sensitive information always use HTTPS encryption</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-blue-600 font-bold mt-1">•</span>
+                  <span><strong>Shortened URLs:</strong> Bit.ly, TinyURL, or similar services that hide the real destination</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-blue-600 font-bold mt-1">•</span>
+                  <span><strong>Unusual urgency:</strong> "Verify your account immediately or it will be closed"</span>
+                </li>
+              </ul>
+            </div>
+
+            {/* FAQ 5 */}
+            <div className="pb-8 border-b border-gray-100 last:border-0">
+              <h3 className="text-xl font-semibold text-gray-900 mb-3 flex items-start gap-2">
+                <div className="w-6 h-6 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <span className="text-xs font-bold text-blue-600">5</span>
+                </div>
+                How can email authentication prevent phishing attacks?
+              </h3>
+              <p className="text-gray-700 leading-relaxed mb-3 ml-8">
+                Email authentication protocols are critical defenses against phishing and email spoofing:
+              </p>
+              <ul className="space-y-2 text-gray-700 ml-14 mb-3">
+                <li className="flex items-start gap-2">
+                  <span className="text-blue-600 font-bold mt-1">•</span>
+                  <span>
+                    <strong>
+                      <a href="https://sendmarc.com/dmarc/" className="text-blue-600 hover:text-blue-700 underline hover:no-underline transition-all" target="_blank" rel="noopener noreferrer">
+                        DMARC
+                      </a>
+                      :
+                    </strong> Tells email servers how to handle emails that fail authentication, preventing spoofed emails from reaching inboxes
+                  </span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-blue-600 font-bold mt-1">•</span>
+                  <span>
+                    <strong>
+                      <a href="https://sendmarc.com/spf/" className="text-blue-600 hover:text-blue-700 underline hover:no-underline transition-all" target="_blank" rel="noopener noreferrer">
+                        SPF
+                      </a>
+                      :
+                    </strong> Specifies which mail servers are authorized to send emails on behalf of your domain
+                  </span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-blue-600 font-bold mt-1">•</span>
+                  <span>
+                    <strong>
+                      <a href="https://sendmarc.com/dkim/" className="text-blue-600 hover:text-blue-700 underline hover:no-underline transition-all" target="_blank" rel="noopener noreferrer">
+                        DKIM
+                      </a>
+                      :
+                    </strong> Adds a digital signature to emails, verifying they haven't been tampered with in transit
+                  </span>
+                </li>
+              </ul>
+              <p className="text-gray-700 leading-relaxed ml-8">
+                Together, these protocols make it significantly harder for attackers to impersonate legitimate domains. Organizations using{' '}
+                <a href="https://www.sendmarc.com" className="text-blue-600 hover:text-blue-700 font-medium underline hover:no-underline transition-all" target="_blank" rel="noopener noreferrer">
+                  DMARC enforcement
+                </a>
+                {' '}can block up to 99% of email-based phishing attacks.
+              </p>
+            </div>
+
+            {/* FAQ 6 */}
+            <div className="pb-8 border-b border-gray-100 last:border-0">
+              <h3 className="text-xl font-semibold text-gray-900 mb-3 flex items-start gap-2">
+                <div className="w-6 h-6 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <span className="text-xs font-bold text-blue-600">6</span>
+                </div>
+                What should I do if I find a suspicious link?
+              </h3>
+              <p className="text-gray-700 leading-relaxed mb-3 ml-8">
+                If our tool identifies a URL as suspicious, or if you have any doubts:
+              </p>
+              <ul className="space-y-2 text-gray-700 ml-14 mb-3">
+                <li className="flex items-start gap-2">
+                  <span className="text-blue-600 font-bold mt-1">•</span>
+                  <span><strong>Do not click the link</strong> - Even visiting a malicious site can compromise your security</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-blue-600 font-bold mt-1">•</span>
+                  <span><strong>Delete the email or message</strong> - Do not forward it to others</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-blue-600 font-bold mt-1">•</span>
+                  <span><strong>Report it</strong> - Forward phishing emails to your IT security team or report it to the impersonated organization</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-blue-600 font-bold mt-1">•</span>
+                  <span><strong>Verify directly</strong> - If the email claims to be from your bank or a service you use, contact them directly using official contact information (not from the suspicious email)</span>
+                </li>
+              </ul>
+              <p className="text-gray-700 leading-relaxed ml-8">
+                Learn more about{' '}
+                <a href="https://sendmarc.com/blog/changing-user-behaviour-to-prevent-phishing-attacks/" className="text-blue-600 hover:text-blue-700 font-medium underline hover:no-underline transition-all" target="_blank" rel="noopener noreferrer">
+                  behavioral changes that prevent phishing attacks
+                </a>
+                {' '}and protect your organization.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Footer */}
-      <footer className="border-t border-gray-200 py-6 mt-16">
+      <footer className="border-t border-gray-200/50 py-8 bg-white/50 backdrop-blur-sm">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <p className="text-sm text-gray-600">
             Powered by{' '}
@@ -575,7 +850,7 @@ export default function Home() {
               href="https://www.sendmarc.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-blue-600 hover:text-blue-700 font-medium"
+              className="text-blue-600 hover:text-blue-700 font-medium transition-colors"
             >
               Sendmarc
             </a>
