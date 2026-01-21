@@ -1,8 +1,34 @@
-# Phishing URL Checker
+# Sendmarc Phishing URL Checker
 
 **Live Demo:** [https://phishing-checker-zeta.vercel.app](https://phishing-checker-zeta.vercel.app)
 
-A free, demo tool to check URLs and email content for phishing threats using VirusTotal and Google Safe Browsing.
+A professional phishing URL detection tool powered by VirusTotal, Google Safe Browsing, and advanced domain analysis.
+
+---
+
+## 🚨 CRITICAL SECURITY NOTICE
+
+**API keys were previously exposed in git history (commit a277130, January 21 2026).**
+
+### Immediate Actions Required:
+
+1. **ROTATE ALL API KEYS IMMEDIATELY:**
+   - VirusTotal: https://www.virustotal.com/gui/user/YOUR_USERNAME/apikey
+   - Google Safe Browsing: https://console.cloud.google.com/apis/credentials
+
+2. **The git history has been cleaned using git filter-branch**, but you MUST still rotate the keys as they were publicly visible on GitHub.
+
+3. **Update Vercel environment variables** with the new keys:
+   ```bash
+   vercel env rm VIRUSTOTAL_API_KEY production
+   vercel env rm GOOGLE_SAFE_BROWSING_API_KEY production
+   vercel env add VIRUSTOTAL_API_KEY production
+   vercel env add GOOGLE_SAFE_BROWSING_API_KEY production
+   ```
+
+4. **Files that were cleaned from history:**
+   - `PROJECT_CONTEXT.md` (contained plaintext API keys)
+   - `.claude/settings.local.json`
 
 ---
 
