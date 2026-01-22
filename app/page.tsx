@@ -806,28 +806,44 @@ export default function Home() {
           <p className="text-gray-600">Have more questions? <a href="https://www.sendmarc.com/contact" className="text-blue-600 hover:text-blue-700 font-medium">Contact Us</a></p>
         </div>
 
-        <div className="space-y-3">
+        <div className="space-y-4">
           {faqs.map((faq, index) => (
             <div
               key={index}
-              className="bg-white rounded-xl border border-gray-200/60 shadow-sm hover:shadow-lg hover:shadow-blue-500/5 hover:-translate-y-0.5 transition-all duration-300 ease-out"
+              className="faq-item bg-white rounded-2xl border border-gray-200/60 shadow-sm overflow-hidden"
             >
               <button
                 onClick={() => setOpenFaqIndex(openFaqIndex === index ? null : index)}
-                className="w-full flex items-center justify-between p-6 text-left hover:bg-gray-50/50 transition-all duration-200 ease-out rounded-xl"
+                className={`w-full flex items-center justify-between p-6 text-left transition-all duration-300 ease-out ${
+                  openFaqIndex === index
+                    ? 'bg-gradient-to-r from-blue-50/80 to-white'
+                    : 'hover:bg-gray-50/80'
+                }`}
               >
-                <span className="font-semibold text-gray-900 text-lg pr-4">{faq.question}</span>
-                <ChevronDown
-                  className={`w-5 h-5 text-gray-600 flex-shrink-0 transition-transform duration-200 ${
-                    openFaqIndex === index ? 'rotate-180' : ''
-                  }`}
-                />
+                <span className={`font-semibold text-lg pr-4 transition-colors duration-200 ${
+                  openFaqIndex === index ? 'text-blue-900' : 'text-gray-900'
+                }`}>{faq.question}</span>
+                <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${
+                  openFaqIndex === index
+                    ? 'bg-blue-100 text-blue-600'
+                    : 'bg-gray-100 text-gray-500'
+                }`}>
+                  <ChevronDown
+                    className={`w-5 h-5 faq-chevron ${
+                      openFaqIndex === index ? 'faq-chevron-open' : ''
+                    }`}
+                  />
+                </div>
               </button>
-              {openFaqIndex === index && (
-                <div className="px-6 pb-6 text-gray-700 leading-relaxed animate-in fade-in slide-in-from-top-2 duration-200">
+              <div className={`transition-all duration-300 ease-out ${
+                openFaqIndex === index
+                  ? 'max-h-[1000px] opacity-100'
+                  : 'max-h-0 opacity-0 overflow-hidden'
+              }`}>
+                <div className="px-6 pb-6 pt-2 text-gray-700 leading-relaxed border-t border-gray-100">
                   {faq.answer}
                 </div>
-              )}
+              </div>
             </div>
           ))}
         </div>
@@ -840,7 +856,15 @@ export default function Home() {
             {/* Company Info */}
             <div>
               <div className="mb-6">
-                <span className="text-white text-2xl font-bold tracking-tight">Sendmarc</span>
+                <a href="https://www.sendmarc.com" target="_blank" rel="noopener noreferrer" className="inline-block hover:opacity-80 transition-opacity duration-200">
+                  <Image
+                    src="https://help.sendmarc.com/hubfs/Sendmarc-Logo-RGB-Main.jpg"
+                    alt="Sendmarc"
+                    width={160}
+                    height={40}
+                    className="h-10 w-auto brightness-0 invert"
+                  />
+                </a>
               </div>
               <p className="text-sm text-gray-400 mb-4">
                 Protect your domain and email infrastructure with DMARC, SPF, and DKIM authentication.

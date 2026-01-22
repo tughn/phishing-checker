@@ -1,0 +1,11 @@
+# Robots.txt for Sendmarc Phishing Checker
+# https://tools.sendmarc.com
+
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://tools.sendmarc.com/sitemap.xml
+
+# Crawl-delay (optional, be polite to crawlers)
+Crawl-delay: 1

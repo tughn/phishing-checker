@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Free Phishing URL Checker & Email Link Scanner | Sendmarc",
-  description: "Check any URL or email for phishing threats instantly. Free phishing link checker with VirusTotal & Google Safe Browsing. Analyze suspicious links and protect your business from email phishing attacks.",
+  description: "Check any URL for phishing threats instantly. Free scanner with VirusTotal & Google Safe Browsing integration.",
   keywords: [
     "phishing checker",
     "phishing url scanner",
@@ -43,7 +43,7 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: "https://tools.sendmarc.com/phishing-checker",
     title: "Free Phishing URL Checker & Email Link Scanner | Sendmarc",
-    description: "Check any URL or email for phishing threats instantly. Free phishing link checker with VirusTotal & Google Safe Browsing.",
+    description: "Check any URL for phishing threats instantly. Free scanner with VirusTotal & Google Safe Browsing integration.",
     siteName: "Sendmarc Security Tools",
     images: [
       {
@@ -62,6 +62,9 @@ export const metadata: Metadata = {
   },
   alternates: {
     canonical: "https://tools.sendmarc.com/phishing-checker",
+  },
+  other: {
+    "og:updated_time": new Date().toISOString(),
   },
 };
 
