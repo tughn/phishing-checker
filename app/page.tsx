@@ -857,11 +857,9 @@ export default function Home() {
             <div>
               <div className="mb-6">
                 <a href="https://www.sendmarc.com" target="_blank" rel="noopener noreferrer" className="inline-block hover:opacity-80 transition-opacity duration-200">
-                  <Image
-                    src="https://www.sendmarc.com/hubfs/Sendmarc%20June%202024/Images/Sendmarc-Logo-RGB-Main-Inverted.png"
+                  <img
+                    src="https://i0.wp.com/ekoparty.org/wp-content/uploads/2024/10/Sendmarc-Logo-RGB-Main-Inverted-1.png?fit=1635%2C567&ssl=1"
                     alt="Sendmarc"
-                    width={160}
-                    height={40}
                     className="h-10 w-auto"
                   />
                 </a>
