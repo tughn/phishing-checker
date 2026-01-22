@@ -798,82 +798,87 @@ export default function Home() {
       </main>
 
       {/* FAQ Section with Dropdowns */}
-      <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-gray-900 mb-3">
-            Frequently Asked Questions
-          </h2>
-          <p className="text-gray-600">Have more questions? <a href="https://www.sendmarc.com/contact" className="text-blue-600 hover:text-blue-700 font-medium">Contact Us</a></p>
-        </div>
+      <section className="bg-[#F9FAFB] py-16 md:py-24 px-4">
+        <div className="max-w-[800px] mx-auto">
+          <div className="text-center mb-10">
+            <h2 className="text-2xl md:text-4xl font-bold text-[#111827] mb-2.5 tracking-tight">
+              Frequently Asked Questions
+            </h2>
+            <p className="text-[15px] md:text-[17px] text-[#6B7280]">
+              Have more questions? <a href="https://www.sendmarc.com/contact" className="text-blue-600 hover:text-blue-700 font-medium">Contact Us</a>
+            </p>
+          </div>
 
-        <div className="space-y-4">
-          {faqs.map((faq, index) => (
-            <div
-              key={index}
-              className="faq-item bg-white rounded-2xl border border-gray-200/60 shadow-sm overflow-hidden"
-            >
-              <button
-                onClick={() => setOpenFaqIndex(openFaqIndex === index ? null : index)}
-                className={`w-full flex items-center justify-between p-6 text-left transition-all duration-300 ease-out ${
-                  openFaqIndex === index
-                    ? 'bg-gradient-to-r from-blue-50/80 to-white'
-                    : 'hover:bg-gray-50/80'
-                }`}
+          <div className="space-y-3">
+            {faqs.map((faq, index) => (
+              <div
+                key={index}
+                className={`faq-item ${openFaqIndex === index ? 'faq-item-open' : ''}`}
               >
-                <span className={`font-semibold text-lg pr-4 transition-colors duration-200 ${
-                  openFaqIndex === index ? 'text-blue-900' : 'text-gray-900'
-                }`}>{faq.question}</span>
-                <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${
-                  openFaqIndex === index
-                    ? 'bg-blue-100 text-blue-600'
-                    : 'bg-gray-100 text-gray-500'
-                }`}>
-                  <ChevronDown
-                    className={`w-5 h-5 faq-chevron ${
-                      openFaqIndex === index ? 'faq-chevron-open' : ''
+                <button
+                  onClick={() => setOpenFaqIndex(openFaqIndex === index ? null : index)}
+                  className="w-full flex items-center justify-between p-5 md:px-6 md:py-5 text-left transition-all duration-200"
+                >
+                  <span
+                    className={`font-medium text-[15px] md:text-[17px] pr-4 transition-colors duration-200 ${
+                      openFaqIndex === index ? 'text-[#1D4ED8]' : 'text-[#1F2937]'
                     }`}
-                  />
-                </div>
-              </button>
-              <div className={`transition-all duration-300 ease-out ${
-                openFaqIndex === index
-                  ? 'max-h-[1000px] opacity-100'
-                  : 'max-h-0 opacity-0 overflow-hidden'
-              }`}>
-                <div className="px-6 pb-6 pt-2 text-gray-700 leading-relaxed border-t border-gray-100">
-                  {faq.answer}
+                  >
+                    {faq.question}
+                  </span>
+                  <div
+                    className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${
+                      openFaqIndex === index
+                        ? 'bg-[#EEF2FF] border border-[#C7D2FE]'
+                        : 'bg-[#F3F4F6] border border-transparent'
+                    }`}
+                  >
+                    <ChevronDown
+                      className={`w-4 h-4 faq-chevron ${openFaqIndex === index ? 'faq-chevron-open' : ''}`}
+                      style={{ color: openFaqIndex === index ? '#2563EB' : '#6B7280' }}
+                    />
+                  </div>
+                </button>
+                <div
+                  className={`transition-all duration-[350ms] ease-[cubic-bezier(0.4,0,0.2,1)] overflow-hidden ${
+                    openFaqIndex === index ? 'max-h-[350px] opacity-100' : 'max-h-0 opacity-0'
+                  }`}
+                >
+                  <div className="px-5 md:px-6 pb-5 md:pb-6 text-[#4B5563] text-[14px] md:text-[15px] leading-relaxed">
+                    {faq.answer}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </section>
 
       {/* Professional Footer */}
-      <footer className="bg-gray-900 text-gray-300 pt-16 pb-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+      <footer className="bg-[#111827] text-[#9CA3AF] pt-16 pb-8 px-6">
+        <div className="max-w-[1100px] mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8 mb-12">
             {/* Company Info */}
-            <div>
-              <div className="mb-6">
+            <div className="max-w-[280px]">
+              <div className="mb-5">
                 <a href="https://www.sendmarc.com" target="_blank" rel="noopener noreferrer" className="inline-block hover:opacity-80 transition-opacity duration-200">
                   <img
                     src="https://i0.wp.com/ekoparty.org/wp-content/uploads/2024/10/Sendmarc-Logo-RGB-Main-Inverted-1.png?fit=1635%2C567&ssl=1"
                     alt="Sendmarc"
-                    className="h-10 w-auto"
+                    className="h-8 w-auto"
                   />
                 </a>
               </div>
-              <p className="text-sm text-gray-400 mb-4">
+              <p className="text-[13px] leading-relaxed text-[#6B7280] mb-4">
                 Protect your domain and email infrastructure with DMARC, SPF, and DKIM authentication.
               </p>
-              <div className="space-y-2 text-sm">
-                <a href="mailto:info@sendmarc.com" className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors">
-                  <Mail className="w-4 h-4" />
+              <div className="space-y-2.5">
+                <a href="mailto:info@sendmarc.com" className="flex items-center gap-2 text-[13px] text-[#9CA3AF] hover:text-white transition-colors duration-200">
+                  <Mail className="w-3.5 h-3.5" />
                   info@sendmarc.com
                 </a>
-                <a href="tel:+27109000972" className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors">
-                  <Phone className="w-4 h-4" />
+                <a href="tel:+27109000972" className="flex items-center gap-2 text-[13px] text-[#9CA3AF] hover:text-white transition-colors duration-200">
+                  <Phone className="w-3.5 h-3.5" />
                   +27 10 900 0972
                 </a>
               </div>
@@ -881,26 +886,26 @@ export default function Home() {
 
             {/* Security Tools */}
             <div>
-              <h3 className="font-semibold text-white mb-4">Security Tools</h3>
-              <ul className="space-y-2 text-sm">
+              <h4 className="text-[13px] font-semibold text-white mb-4 uppercase tracking-wider">Security Tools</h4>
+              <ul className="space-y-2.5">
                 <li>
-                  <a href="https://tools.sendmarc.com/phishing-checker" className="text-gray-400 hover:text-white transition-colors flex items-center gap-1">
+                  <a href="https://tools.sendmarc.com/phishing-checker" className="footer-link inline-flex items-center gap-1 text-[13px] text-[#9CA3AF]">
                     Phishing URL Checker
                   </a>
                 </li>
                 <li>
-                  <a href="https://sendmarc.com/spf/" className="text-gray-400 hover:text-white transition-colors flex items-center gap-1">
-                    SPF Record Checker <ExternalLink className="w-3 h-3" />
+                  <a href="https://sendmarc.com/spf/" className="footer-link inline-flex items-center gap-1 text-[13px] text-[#9CA3AF]">
+                    SPF Record Checker <ExternalLink className="w-[11px] h-[11px] opacity-70" />
                   </a>
                 </li>
                 <li>
-                  <a href="https://sendmarc.com/dkim/" className="text-gray-400 hover:text-white transition-colors flex items-center gap-1">
-                    DKIM Record Checker <ExternalLink className="w-3 h-3" />
+                  <a href="https://sendmarc.com/dkim/" className="footer-link inline-flex items-center gap-1 text-[13px] text-[#9CA3AF]">
+                    DKIM Record Checker <ExternalLink className="w-[11px] h-[11px] opacity-70" />
                   </a>
                 </li>
                 <li>
-                  <a href="https://sendmarc.com/dmarc/" className="text-gray-400 hover:text-white transition-colors flex items-center gap-1">
-                    DMARC Analyzer <ExternalLink className="w-3 h-3" />
+                  <a href="https://sendmarc.com/dmarc/" className="footer-link inline-flex items-center gap-1 text-[13px] text-[#9CA3AF]">
+                    DMARC Analyzer <ExternalLink className="w-[11px] h-[11px] opacity-70" />
                   </a>
                 </li>
               </ul>
@@ -908,21 +913,21 @@ export default function Home() {
 
             {/* Resources */}
             <div>
-              <h3 className="font-semibold text-white mb-4">Resources</h3>
-              <ul className="space-y-2 text-sm">
+              <h4 className="text-[13px] font-semibold text-white mb-4 uppercase tracking-wider">Resources</h4>
+              <ul className="space-y-2.5">
                 <li>
-                  <a href="https://sendmarc.com/blog/" className="text-gray-400 hover:text-white transition-colors flex items-center gap-1">
-                    Blog <ExternalLink className="w-3 h-3" />
+                  <a href="https://sendmarc.com/blog/" className="footer-link inline-flex items-center gap-1 text-[13px] text-[#9CA3AF]">
+                    Blog <ExternalLink className="w-[11px] h-[11px] opacity-70" />
                   </a>
                 </li>
                 <li>
-                  <a href="https://sendmarc.com/blog/spear-phishing-vs-phishing/" className="text-gray-400 hover:text-white transition-colors flex items-center gap-1">
-                    Phishing Guide <ExternalLink className="w-3 h-3" />
+                  <a href="https://sendmarc.com/blog/spear-phishing-vs-phishing/" className="footer-link inline-flex items-center gap-1 text-[13px] text-[#9CA3AF]">
+                    Phishing Guide <ExternalLink className="w-[11px] h-[11px] opacity-70" />
                   </a>
                 </li>
                 <li>
-                  <a href="https://help.sendmarc.com/" className="text-gray-400 hover:text-white transition-colors flex items-center gap-1">
-                    Knowledge Base <ExternalLink className="w-3 h-3" />
+                  <a href="https://help.sendmarc.com/" className="footer-link inline-flex items-center gap-1 text-[13px] text-[#9CA3AF]">
+                    Knowledge Base <ExternalLink className="w-[11px] h-[11px] opacity-70" />
                   </a>
                 </li>
               </ul>
@@ -930,26 +935,26 @@ export default function Home() {
 
             {/* Company */}
             <div>
-              <h3 className="font-semibold text-white mb-4">Company</h3>
-              <ul className="space-y-2 text-sm">
+              <h4 className="text-[13px] font-semibold text-white mb-4 uppercase tracking-wider">Company</h4>
+              <ul className="space-y-2.5">
                 <li>
-                  <a href="https://www.sendmarc.com" className="text-gray-400 hover:text-white transition-colors flex items-center gap-1">
-                    About Sendmarc <ExternalLink className="w-3 h-3" />
+                  <a href="https://www.sendmarc.com" className="footer-link inline-flex items-center gap-1 text-[13px] text-[#9CA3AF]">
+                    About Sendmarc <ExternalLink className="w-[11px] h-[11px] opacity-70" />
                   </a>
                 </li>
                 <li>
-                  <a href="https://www.sendmarc.com/contact" className="text-gray-400 hover:text-white transition-colors flex items-center gap-1">
-                    Contact Us <ExternalLink className="w-3 h-3" />
+                  <a href="https://www.sendmarc.com/contact" className="footer-link inline-flex items-center gap-1 text-[13px] text-[#9CA3AF]">
+                    Contact Us <ExternalLink className="w-[11px] h-[11px] opacity-70" />
                   </a>
                 </li>
                 <li>
-                  <a href="https://www.sendmarc.com/privacy" className="text-gray-400 hover:text-white transition-colors flex items-center gap-1">
-                    Privacy Policy <ExternalLink className="w-3 h-3" />
+                  <a href="https://www.sendmarc.com/privacy" className="footer-link inline-flex items-center gap-1 text-[13px] text-[#9CA3AF]">
+                    Privacy Policy <ExternalLink className="w-[11px] h-[11px] opacity-70" />
                   </a>
                 </li>
                 <li>
-                  <a href="https://trust.sendmarc.com" className="text-gray-400 hover:text-white transition-colors flex items-center gap-1">
-                    Trust Center <ExternalLink className="w-3 h-3" />
+                  <a href="https://trust.sendmarc.com" className="footer-link inline-flex items-center gap-1 text-[13px] text-[#9CA3AF]">
+                    Trust Center <ExternalLink className="w-[11px] h-[11px] opacity-70" />
                   </a>
                 </li>
               </ul>
@@ -957,12 +962,12 @@ export default function Home() {
           </div>
 
           {/* Bottom Bar */}
-          <div className="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-sm text-gray-400">
+          <div className="border-t border-[#1F2937] pt-6 flex flex-wrap justify-between items-center gap-3">
+            <p className="text-[12px] text-[#6B7280]">
               © {new Date().getFullYear()} Sendmarc. All rights reserved.
             </p>
-            <p className="text-sm text-gray-400">
-              Powered by <a href="https://www.sendmarc.com" className="text-white hover:text-blue-400 transition-colors">Sendmarc</a>
+            <p className="text-[12px] text-[#6B7280]">
+              Powered by <a href="https://www.sendmarc.com" className="text-white hover:text-[#60A5FA] transition-colors duration-200">Sendmarc</a>
             </p>
           </div>
         </div>

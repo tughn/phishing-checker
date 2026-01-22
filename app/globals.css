@@ -107,23 +107,42 @@ body {
   animation: faqExpand 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* FAQ item hover effects */
+/* FAQ item styling */
 .faq-item {
+  background: white;
+  border-radius: 14px;
+  border: 1px solid #E5E7EB;
+  overflow: hidden;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
 .faq-item:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.1);
+  background: #F8FAFC;
+}
+
+.faq-item-open {
+  border-color: #BFDBFE;
+  box-shadow: 0 4px 20px -4px rgba(37, 99, 235, 0.1);
 }
 
 /* FAQ chevron rotation */
 .faq-chevron {
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .faq-chevron-open {
   transform: rotate(180deg);
+}
+
+/* Footer link hover effect */
+.footer-link {
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.footer-link:hover {
+  color: #fff;
+  transform: translateX(2px);
 }
 
 /* Smooth glow effect for interactive elements */
