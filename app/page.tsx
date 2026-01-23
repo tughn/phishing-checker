@@ -10,7 +10,6 @@ import {
   Globe,
   ChevronRight,
   ChevronDown,
-  Search,
   Loader2,
   XCircle,
   Info,
@@ -889,45 +888,60 @@ export default function Home() {
               <h4 className="text-[13px] font-semibold text-white mb-4 uppercase tracking-wider">Security Tools</h4>
               <ul className="space-y-2.5">
                 <li>
-                  <a href="https://tools.sendmarc.com/phishing-checker" className="footer-link inline-flex items-center gap-1 text-[13px] text-[#9CA3AF]">
-                    Phishing URL Checker
-                  </a>
-                </li>
-                <li>
-                  <a href="https://sendmarc.com/spf/" className="footer-link inline-flex items-center gap-1 text-[13px] text-[#9CA3AF]">
-                    SPF Record Checker <ExternalLink className="w-[11px] h-[11px] opacity-70" />
-                  </a>
-                </li>
-                <li>
-                  <a href="https://sendmarc.com/dkim/" className="footer-link inline-flex items-center gap-1 text-[13px] text-[#9CA3AF]">
-                    DKIM Record Checker <ExternalLink className="w-[11px] h-[11px] opacity-70" />
-                  </a>
-                </li>
-                <li>
-                  <a href="https://sendmarc.com/dmarc/" className="footer-link inline-flex items-center gap-1 text-[13px] text-[#9CA3AF]">
+                  <a href="https://sendmarc.com/dmarc/dmarc-analyzer/" className="footer-link inline-flex items-center gap-1 text-[13px] text-[#9CA3AF]">
                     DMARC Analyzer <ExternalLink className="w-[11px] h-[11px] opacity-70" />
+                  </a>
+                </li>
+                <li>
+                  <a href="https://sendmarc.com/dmarc/record-generator/" className="footer-link inline-flex items-center gap-1 text-[13px] text-[#9CA3AF]">
+                    DMARC Generator <ExternalLink className="w-[11px] h-[11px] opacity-70" />
+                  </a>
+                </li>
+                <li>
+                  <a href="https://sendmarc.com/spf/policy-tester/" className="footer-link inline-flex items-center gap-1 text-[13px] text-[#9CA3AF]">
+                    SPF Policy Tester <ExternalLink className="w-[11px] h-[11px] opacity-70" />
+                  </a>
+                </li>
+                <li>
+                  <a href="https://sendmarc.com/dmarc/email-header-analyzer/" className="footer-link inline-flex items-center gap-1 text-[13px] text-[#9CA3AF]">
+                    Email Header Analyzer <ExternalLink className="w-[11px] h-[11px] opacity-70" />
+                  </a>
+                </li>
+                <li>
+                  <a href="https://sendmarc.com/tls-rpt/record-checker/" className="footer-link inline-flex items-center gap-1 text-[13px] text-[#9CA3AF]">
+                    TLS-RPT Checker <ExternalLink className="w-[11px] h-[11px] opacity-70" />
                   </a>
                 </li>
               </ul>
             </div>
 
-            {/* Resources */}
+            {/* Learn */}
             <div>
-              <h4 className="text-[13px] font-semibold text-white mb-4 uppercase tracking-wider">Resources</h4>
+              <h4 className="text-[13px] font-semibold text-white mb-4 uppercase tracking-wider">Learn</h4>
               <ul className="space-y-2.5">
+                <li>
+                  <a href="https://sendmarc.com/dmarc/what-is-dmarc/" className="footer-link inline-flex items-center gap-1 text-[13px] text-[#9CA3AF]">
+                    What is DMARC? <ExternalLink className="w-[11px] h-[11px] opacity-70" />
+                  </a>
+                </li>
+                <li>
+                  <a href="https://sendmarc.com/spf/what-is-spf/" className="footer-link inline-flex items-center gap-1 text-[13px] text-[#9CA3AF]">
+                    What is SPF? <ExternalLink className="w-[11px] h-[11px] opacity-70" />
+                  </a>
+                </li>
+                <li>
+                  <a href="https://sendmarc.com/dkim/what-is-dkim/" className="footer-link inline-flex items-center gap-1 text-[13px] text-[#9CA3AF]">
+                    What is DKIM? <ExternalLink className="w-[11px] h-[11px] opacity-70" />
+                  </a>
+                </li>
+                <li>
+                  <a href="https://sendmarc.com/bimi/what-is-bimi/" className="footer-link inline-flex items-center gap-1 text-[13px] text-[#9CA3AF]">
+                    What is BIMI? <ExternalLink className="w-[11px] h-[11px] opacity-70" />
+                  </a>
+                </li>
                 <li>
                   <a href="https://sendmarc.com/blog/" className="footer-link inline-flex items-center gap-1 text-[13px] text-[#9CA3AF]">
                     Blog <ExternalLink className="w-[11px] h-[11px] opacity-70" />
-                  </a>
-                </li>
-                <li>
-                  <a href="https://sendmarc.com/blog/spear-phishing-vs-phishing/" className="footer-link inline-flex items-center gap-1 text-[13px] text-[#9CA3AF]">
-                    Phishing Guide <ExternalLink className="w-[11px] h-[11px] opacity-70" />
-                  </a>
-                </li>
-                <li>
-                  <a href="https://help.sendmarc.com/" className="footer-link inline-flex items-center gap-1 text-[13px] text-[#9CA3AF]">
-                    Knowledge Base <ExternalLink className="w-[11px] h-[11px] opacity-70" />
                   </a>
                 </li>
               </ul>
