@@ -458,99 +458,76 @@ export default function Home() {
 
           {/* Single URL Result */}
           {result && !loading && (
-            <div className="space-y-4 fade-in">
-              {/* Verdict Header */}
-              <div className={`card overflow-hidden ${
-                result.verdict === 'SUSPICIOUS' ? 'border-[#ef4444]' : 'border-[#10b981]'
-              }`}>
-                <div className={`px-5 py-3 flex items-center gap-3 ${
+            <div className="fade-in">
+              {/* Verdict */}
+              <div className="text-center mb-6">
+                <div className={`inline-flex items-center justify-center w-16 h-16 rounded-full mb-4 ${
                   result.verdict === 'SUSPICIOUS' ? 'bg-[#fef2f2]' : 'bg-[#ecfdf5]'
                 }`}>
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                    result.verdict === 'SUSPICIOUS' ? 'bg-[#ef4444]' : 'bg-[#10b981]'
-                  }`}>
-                    {result.verdict === 'SUSPICIOUS' ? (
-                      <AlertTriangle className="w-4 h-4 text-white" />
-                    ) : (
-                      <CheckCircle2 className="w-4 h-4 text-white" />
-                    )}
-                  </div>
-                  <div>
-                    <h3 className={`text-lg font-bold ${
-                      result.verdict === 'SUSPICIOUS' ? 'text-[#dc2626]' : 'text-[#059669]'
-                    }`}>
-                      {result.verdict === 'SUSPICIOUS' ? 'Threat Detected' : 'No Threats Found'}
-                    </h3>
-                    <p className="text-[13px] text-[#64748b]">
-                      {result.verdict === 'SUSPICIOUS'
-                        ? 'This URL has been flagged as potentially dangerous'
-                        : 'This URL appears to be safe'}
-                    </p>
-                  </div>
+                  {result.verdict === 'SUSPICIOUS' ? (
+                    <AlertTriangle className="w-8 h-8 text-[#ef4444]" />
+                  ) : (
+                    <CheckCircle2 className="w-8 h-8 text-[#10b981]" />
+                  )}
                 </div>
-
-                {/* URL Display */}
-                <div className="px-5 py-3 border-t border-[#f1f5f9] bg-[#f8fafc]">
-                  <p className="text-[13px] text-[#64748b] font-mono break-all">{result.url}</p>
-                </div>
-
-                {/* Suspicion Reasons */}
-                {result.suspicionReasons && result.suspicionReasons.length > 0 && (
-                  <div className="px-5 py-3 border-t border-[#f1f5f9]">
-                    {result.suspicionReasons.map((reason, idx) => (
-                      <div key={idx} className="flex items-center gap-2 py-1.5 text-[13px] text-[#dc2626]">
-                        <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0" />
-                        <span>{reason}</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                <h2 className={`text-2xl font-bold mb-2 ${
+                  result.verdict === 'SUSPICIOUS' ? 'text-[#dc2626]' : 'text-[#059669]'
+                }`}>
+                  {result.verdict === 'SUSPICIOUS' ? 'Threat Detected' : 'URL is Safe'}
+                </h2>
+                <p className="text-[13px] text-[#64748b] font-mono break-all max-w-lg mx-auto">{result.url}</p>
               </div>
 
-              {/* Analysis Details Card */}
-              <div className="card">
-                <div className="px-5 py-3 border-b border-[#f1f5f9]">
-                  <h4 className="font-semibold text-[#08121E] text-[15px]">Security Analysis</h4>
+              {/* Warnings */}
+              {result.suspicionReasons && result.suspicionReasons.length > 0 && (
+                <div className="mb-6 p-4 bg-[#fef2f2] border border-[#fecaca] rounded-lg">
+                  {result.suspicionReasons.map((reason, idx) => (
+                    <div key={idx} className="flex items-center gap-2 py-1 text-[13px] text-[#dc2626]">
+                      <XCircle className="w-4 h-4 flex-shrink-0" />
+                      <span>{reason}</span>
+                    </div>
+                  ))}
                 </div>
+              )}
 
-                {/* VirusTotal Row */}
+              {/* Checks - Simple list */}
+              <div className="space-y-2 mb-6">
+                {/* VirusTotal */}
                 {result.checks.virustotal && !result.checks.virustotal.error && !result.checks.virustotal.status && (
-                  <div className="status-row">
-                    <div className={`status-icon ${
-                      result.checks.virustotal.malicious > 0 ? 'status-icon-error' : 'status-icon-success'
-                    }`}>
-                      <Shield className="w-4 h-4" />
+                  <div className="flex items-center justify-between py-3 px-4 bg-[#f8fafc] rounded-lg">
+                    <span className="text-[14px] text-[#08121E]">VirusTotal ({result.checks.virustotal.malicious + result.checks.virustotal.suspicious + result.checks.virustotal.harmless} engines)</span>
+                    <div className="flex items-center gap-2">
+                      {result.checks.virustotal.malicious > 0 ? (
+                        <>
+                          <span className="text-[13px] text-[#dc2626] font-medium">{result.checks.virustotal.malicious} flagged</span>
+                          <XCircle className="w-5 h-5 text-[#ef4444]" />
+                        </>
+                      ) : (
+                        <>
+                          <span className="text-[13px] text-[#059669] font-medium">Clean</span>
+                          <CheckCircle2 className="w-5 h-5 text-[#10b981]" />
+                        </>
+                      )}
                     </div>
-                    <div className="flex-1 ml-3">
-                      <div className="text-[14px] font-medium text-[#08121E]">VirusTotal</div>
-                      <div className="text-[12px] text-[#64748b]">
-                        {result.checks.virustotal.malicious} malicious · {result.checks.virustotal.suspicious} suspicious · {result.checks.virustotal.harmless} clean
-                      </div>
-                    </div>
-                    <span className={`badge ${
-                      result.checks.virustotal.malicious > 0 ? 'badge-error' : 'badge-success'
-                    }`}>
-                      {result.checks.virustotal.malicious > 0 ? 'Threats Found' : 'Clean'}
-                    </span>
                   </div>
                 )}
 
-                {/* Detections Expandable */}
+                {/* Detections dropdown */}
                 {result.checks.virustotal?.detections && result.checks.virustotal.detections.length > 0 && (
-                  <div className="px-5 py-2 border-b border-[#f1f5f9] bg-[#fef2f2]">
+                  <div className="px-4">
                     <button
                       onClick={() => setShowDetections(!showDetections)}
-                      className="text-[13px] text-[#dc2626] font-medium flex items-center gap-1.5"
+                      className="text-[12px] text-[#0575E1] font-medium flex items-center gap-1"
                     >
                       {showDetections ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-                      {result.checks.virustotal.detections.length} engines flagged this URL
+                      View {result.checks.virustotal.detections.length} detections
                     </button>
                     {showDetections && (
-                      <div className="mt-2 max-h-40 overflow-y-auto">
+                      <div className="mt-2 ml-5 space-y-1 max-h-32 overflow-y-auto">
                         {result.checks.virustotal.detections.map((detection: any, idx: number) => (
-                          <div key={idx} className="flex justify-between items-center py-1.5 text-[12px]">
-                            <span className="text-[#475569]">{detection.engine}</span>
-                            <span className="text-[#dc2626] font-medium">{detection.result}</span>
+                          <div key={idx} className="flex justify-between text-[12px] py-1">
+                            <span className="text-[#64748b]">{detection.engine}</span>
+                            <span className="text-[#dc2626]">{detection.result}</span>
                           </div>
                         ))}
                       </div>
@@ -558,85 +535,77 @@ export default function Home() {
                   </div>
                 )}
 
-                {/* Google Safe Browsing Row */}
+                {/* Google Safe Browsing */}
                 {result.checks.safeBrowsing && !result.checks.safeBrowsing.error && (
-                  <div className="status-row">
-                    <div className={`status-icon ${
-                      result.checks.safeBrowsing.safe ? 'status-icon-success' : 'status-icon-error'
-                    }`}>
-                      <Globe className="w-4 h-4" />
+                  <div className="flex items-center justify-between py-3 px-4 bg-[#f8fafc] rounded-lg">
+                    <span className="text-[14px] text-[#08121E]">Google Safe Browsing</span>
+                    <div className="flex items-center gap-2">
+                      {result.checks.safeBrowsing.safe ? (
+                        <>
+                          <span className="text-[13px] text-[#059669] font-medium">Safe</span>
+                          <CheckCircle2 className="w-5 h-5 text-[#10b981]" />
+                        </>
+                      ) : (
+                        <>
+                          <span className="text-[13px] text-[#dc2626] font-medium">Unsafe</span>
+                          <XCircle className="w-5 h-5 text-[#ef4444]" />
+                        </>
+                      )}
                     </div>
-                    <div className="flex-1 ml-3">
-                      <div className="text-[14px] font-medium text-[#08121E]">Google Safe Browsing</div>
-                      <div className="text-[12px] text-[#64748b]">Real-time threat database</div>
-                    </div>
-                    <span className={`badge ${
-                      result.checks.safeBrowsing.safe ? 'badge-success' : 'badge-error'
-                    }`}>
-                      {result.checks.safeBrowsing.safe ? 'Safe' : 'Unsafe'}
-                    </span>
                   </div>
                 )}
 
-                {/* SSL Row */}
+                {/* SSL */}
                 {result.checks.ssl && (
-                  <div className="status-row">
-                    <div className={`status-icon ${
-                      result.checks.ssl.secure ? 'status-icon-success' : 'status-icon-warning'
-                    }`}>
-                      <Lock className="w-4 h-4" />
+                  <div className="flex items-center justify-between py-3 px-4 bg-[#f8fafc] rounded-lg">
+                    <span className="text-[14px] text-[#08121E]">SSL Certificate</span>
+                    <div className="flex items-center gap-2">
+                      {result.checks.ssl.secure ? (
+                        <>
+                          <span className="text-[13px] text-[#059669] font-medium">Secure</span>
+                          <CheckCircle2 className="w-5 h-5 text-[#10b981]" />
+                        </>
+                      ) : (
+                        <>
+                          <span className="text-[13px] text-[#d97706] font-medium">Not HTTPS</span>
+                          <AlertTriangle className="w-5 h-5 text-[#f59e0b]" />
+                        </>
+                      )}
                     </div>
-                    <div className="flex-1 ml-3">
-                      <div className="text-[14px] font-medium text-[#08121E]">SSL Certificate</div>
-                      <div className="text-[12px] text-[#64748b]">
-                        {result.checks.ssl.certificate && !result.checks.ssl.certificate.error
-                          ? `${result.checks.ssl.certificate.issuer} · ${result.checks.ssl.certificate.daysUntilExpiry} days until expiry`
-                          : result.checks.ssl.secure ? 'HTTPS enabled' : 'No HTTPS'}
-                      </div>
-                    </div>
-                    <span className={`badge ${
-                      result.checks.ssl.secure ? 'badge-success' : 'badge-warning'
-                    }`}>
-                      {result.checks.ssl.secure ? 'Secure' : 'Insecure'}
-                    </span>
                   </div>
                 )}
 
-                {/* Domain Info Row */}
+                {/* Domain Age */}
                 {result.checks.whois && !result.checks.whois.error && (
-                  <div className="status-row">
-                    <div className={`status-icon ${
-                      result.checks.whois.isNew ? 'status-icon-warning' : 'status-icon-neutral'
-                    }`}>
-                      <Info className="w-4 h-4" />
+                  <div className="flex items-center justify-between py-3 px-4 bg-[#f8fafc] rounded-lg">
+                    <span className="text-[14px] text-[#08121E]">Domain Age</span>
+                    <div className="flex items-center gap-2">
+                      {result.checks.whois.isNew ? (
+                        <>
+                          <span className="text-[13px] text-[#d97706] font-medium">{result.checks.whois.domainAge} days</span>
+                          <AlertTriangle className="w-5 h-5 text-[#f59e0b]" />
+                        </>
+                      ) : (
+                        <>
+                          <span className="text-[13px] text-[#64748b] font-medium">{result.checks.whois.domainAge !== null ? `${result.checks.whois.domainAge} days` : 'Unknown'}</span>
+                          <CheckCircle2 className="w-5 h-5 text-[#10b981]" />
+                        </>
+                      )}
                     </div>
-                    <div className="flex-1 ml-3">
-                      <div className="text-[14px] font-medium text-[#08121E]">Domain Age</div>
-                      <div className="text-[12px] text-[#64748b]">
-                        {result.checks.whois.domainAge !== null ? `${result.checks.whois.domainAge} days old` : 'Unknown'}
-                        {result.checks.whois.registrar && ` · ${result.checks.whois.registrar}`}
-                      </div>
-                    </div>
-                    <span className={`badge ${
-                      result.checks.whois.isNew ? 'badge-warning' : 'badge-neutral'
-                    }`}>
-                      {result.checks.whois.isNew ? 'New Domain' : 'Established'}
-                    </span>
                   </div>
                 )}
               </div>
 
               {/* Back Button */}
-              <div className="text-center pt-2">
+              <div className="text-center">
                 <button
                   onClick={() => {
                     setResult(null);
                     setInput('');
                   }}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-white hover:bg-[#f8fafc] text-[#475569] font-medium rounded-md transition-all duration-200 border border-[#e2e8f0] text-[14px]"
+                  className="text-[14px] text-[#0575E1] hover:text-[#0560b8] font-medium transition-colors"
                 >
-                  <ChevronRight className="w-4 h-4 rotate-180" />
-                  Check Another URL
+                  Check another URL
                 </button>
               </div>
             </div>
@@ -644,112 +613,89 @@ export default function Home() {
 
           {/* Multi URL Results */}
           {multiResult && !loading && (
-            <div className="space-y-4 fade-in">
-              {/* Summary Card */}
-              <div className="card">
-                <div className="px-5 py-4 border-b border-[#f1f5f9]">
-                  <h3 className="text-lg font-bold text-[#08121E]">Scan Results</h3>
-                </div>
-                <div className="p-5">
-                  <div className="grid grid-cols-3 gap-4 mb-4">
-                    <div className="text-center p-4 bg-[#f8fafc] rounded-lg">
-                      <div className="text-3xl font-bold text-[#08121E]">{multiResult.totalUrls}</div>
-                      <div className="text-[12px] text-[#64748b] mt-1">Total URLs</div>
-                    </div>
-                    <div className="text-center p-4 bg-[#fef2f2] rounded-lg">
-                      <div className="text-3xl font-bold text-[#ef4444]">{multiResult.suspiciousCount}</div>
-                      <div className="text-[12px] text-[#64748b] mt-1">Suspicious</div>
-                    </div>
-                    <div className="text-center p-4 bg-[#ecfdf5] rounded-lg">
-                      <div className="text-3xl font-bold text-[#10b981]">{multiResult.cleanCount}</div>
-                      <div className="text-[12px] text-[#64748b] mt-1">Clean</div>
-                    </div>
+            <div className="fade-in">
+              {/* Summary Header */}
+              <div className="text-center mb-6">
+                <div className="flex items-center justify-center gap-6 mb-4">
+                  <div className="text-center">
+                    <div className="text-3xl font-bold text-[#08121E]">{multiResult.totalUrls}</div>
+                    <div className="text-[12px] text-[#64748b]">Scanned</div>
                   </div>
-                  {multiResult.suspiciousCount > 0 && (
-                    <div className="bg-[#fef2f2] border border-[#fecaca] rounded-lg p-3 flex items-center gap-2">
-                      <AlertTriangle className="w-4 h-4 text-[#ef4444] flex-shrink-0" />
-                      <p className="text-[13px] text-[#dc2626] font-medium">Warning: Suspicious URLs detected. Do not click these links.</p>
-                    </div>
-                  )}
+                  <div className="h-10 w-px bg-[#e2e8f0]"></div>
+                  <div className="text-center">
+                    <div className="text-3xl font-bold text-[#10b981]">{multiResult.cleanCount}</div>
+                    <div className="text-[12px] text-[#64748b]">Safe</div>
+                  </div>
+                  <div className="h-10 w-px bg-[#e2e8f0]"></div>
+                  <div className="text-center">
+                    <div className="text-3xl font-bold text-[#ef4444]">{multiResult.suspiciousCount}</div>
+                    <div className="text-[12px] text-[#64748b]">Threats</div>
+                  </div>
                 </div>
+                {multiResult.suspiciousCount > 0 && (
+                  <p className="text-[13px] text-[#dc2626] font-medium">Do not click suspicious links</p>
+                )}
               </div>
 
               {/* URL List */}
-              <div className="card overflow-hidden">
+              <div className="space-y-2 mb-6">
                 {multiResult.results.map((res, idx) => (
-                  <div key={idx} className={`border-b border-[#f1f5f9] last:border-0 ${
-                    res.verdict === 'SUSPICIOUS' ? 'bg-[#fffbfb]' : ''
+                  <div key={idx} className={`py-3 px-4 rounded-lg ${
+                    res.verdict === 'SUSPICIOUS' ? 'bg-[#fef2f2]' : 'bg-[#f8fafc]'
                   }`}>
-                    <div className="p-4 flex items-start gap-3">
-                      <div className={`status-icon flex-shrink-0 ${
-                        res.verdict === 'SUSPICIOUS' ? 'status-icon-error' : 'status-icon-success'
-                      }`}>
-                        {res.verdict === 'SUSPICIOUS' ? (
-                          <AlertTriangle className="w-4 h-4" />
-                        ) : (
-                          <CheckCircle2 className="w-4 h-4" />
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between gap-3 mb-1">
-                          <p className="text-[13px] font-mono break-all text-[#08121E]">{res.url}</p>
-                          <span className={`badge flex-shrink-0 ${
-                            res.verdict === 'SUSPICIOUS' ? 'badge-error' : 'badge-success'
-                          }`}>
-                            {res.verdict}
-                          </span>
-                        </div>
+                    <div className="flex items-center gap-3">
+                      {res.verdict === 'SUSPICIOUS' ? (
+                        <XCircle className="w-5 h-5 text-[#ef4444] flex-shrink-0" />
+                      ) : (
+                        <CheckCircle2 className="w-5 h-5 text-[#10b981] flex-shrink-0" />
+                      )}
+                      <p className="text-[13px] font-mono break-all flex-1 text-[#08121E]">{res.url}</p>
+                    </div>
 
-                        {res.suspicionReasons && res.suspicionReasons.length > 0 && (
-                          <div className="mt-2">
-                            {res.suspicionReasons.map((reason, reasonIdx) => (
-                              <div key={reasonIdx} className="flex items-center gap-1.5 text-[12px] text-[#dc2626] py-0.5">
-                                <AlertTriangle className="w-3 h-3 flex-shrink-0" />
-                                <span>{reason}</span>
+                    {res.suspicionReasons && res.suspicionReasons.length > 0 && (
+                      <div className="mt-2 ml-8">
+                        {res.suspicionReasons.map((reason, reasonIdx) => (
+                          <p key={reasonIdx} className="text-[12px] text-[#dc2626] py-0.5">{reason}</p>
+                        ))}
+                      </div>
+                    )}
+
+                    {res.checks.virustotal?.detections && res.checks.virustotal.detections.length > 0 && (
+                      <div className="mt-2 ml-8">
+                        <button
+                          onClick={() => setExpandedUrlIndex(expandedUrlIndex === idx ? null : idx)}
+                          className="text-[12px] text-[#0575E1] font-medium flex items-center gap-1"
+                        >
+                          {expandedUrlIndex === idx ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
+                          {res.checks.virustotal.detections.length} detections
+                        </button>
+
+                        {expandedUrlIndex === idx && (
+                          <div className="mt-2 space-y-1">
+                            {res.checks.virustotal.detections.map((detection: any, detIdx: number) => (
+                              <div key={detIdx} className="flex justify-between text-[12px]">
+                                <span className="text-[#64748b]">{detection.engine}</span>
+                                <span className="text-[#dc2626]">{detection.result}</span>
                               </div>
                             ))}
                           </div>
                         )}
-
-                        {res.checks.virustotal?.detections && res.checks.virustotal.detections.length > 0 && (
-                          <div className="mt-2">
-                            <button
-                              onClick={() => setExpandedUrlIndex(expandedUrlIndex === idx ? null : idx)}
-                              className="text-[12px] text-[#0575E1] font-medium flex items-center gap-1"
-                            >
-                              {expandedUrlIndex === idx ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
-                              {res.checks.virustotal.detections.length} engines flagged
-                            </button>
-
-                            {expandedUrlIndex === idx && (
-                              <div className="mt-2 pl-4 border-l-2 border-[#fecaca]">
-                                {res.checks.virustotal.detections.map((detection: any, detIdx: number) => (
-                                  <div key={detIdx} className="flex justify-between items-center py-1 text-[12px]">
-                                    <span className="text-[#475569]">{detection.engine}</span>
-                                    <span className="text-[#dc2626]">{detection.result}</span>
-                                  </div>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                        )}
                       </div>
-                    </div>
+                    )}
                   </div>
                 ))}
               </div>
 
               {/* Back Button */}
-              <div className="text-center pt-2">
+              <div className="text-center">
                 <button
                   onClick={() => {
                     setMultiResult(null);
                     setInput('');
                   }}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-white hover:bg-[#f8fafc] text-[#475569] font-medium rounded-md transition-all duration-200 border border-[#e2e8f0] text-[14px]"
+                  className="text-[14px] text-[#0575E1] hover:text-[#0560b8] font-medium transition-colors"
                 >
-                  <ChevronRight className="w-4 h-4 rotate-180" />
-                  Check More URLs
+                  Check more URLs
                 </button>
               </div>
             </div>
