@@ -349,52 +349,52 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-md border-b border-gray-200/50 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center gap-3">
-            <a href="https://www.sendmarc.com" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+      <header className="bg-white border-b border-[#e2e8f0] sticky top-0 z-50">
+        <div className="max-w-[1100px] mx-auto px-4 sm:px-6 lg:px-8 py-3">
+          <div className="flex items-center justify-between">
+            <a href="https://www.sendmarc.com" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 hover:opacity-80 transition-opacity duration-200">
               <Image
                 src="https://help.sendmarc.com/hubfs/Sendmarc-Logo-RGB-Main.jpg"
                 alt="Sendmarc"
-                width={140}
-                height={36}
-                className="h-8 w-auto"
+                width={120}
+                height={32}
+                className="h-7 w-auto"
               />
-              <div className="h-6 w-px bg-gradient-to-b from-gray-300 to-transparent"></div>
-              <h1 className="text-lg font-semibold text-gray-900">
+              <div className="h-5 w-px bg-[#e2e8f0]"></div>
+              <span className="text-[15px] font-semibold text-[#08121E]">
                 Phishing URL Checker
-              </h1>
+              </span>
             </a>
           </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 px-4 sm:px-6 lg:px-8 py-12">
-        <div className="w-full max-w-5xl mx-auto">
+      <main className="flex-1 px-4 sm:px-6 lg:px-8 py-10">
+        <div className="w-full max-w-[800px] mx-auto">
           {/* Input Section - Only show when no results */}
           {!result && !multiResult && (
             <div className="space-y-8 fade-in">
-              <div className="text-center max-w-3xl mx-auto">
-                <h2 className="text-4xl font-bold text-gray-900 mb-4">
+              <div className="text-center max-w-2xl mx-auto">
+                <h2 className="text-3xl md:text-4xl font-bold text-[#08121E] mb-3 tracking-tight">
                   Analyze URLs for Security Threats
                 </h2>
-                <p className="text-lg text-gray-600">
-                  Paste any URL or entire email content to instantly check for phishing, malware, and security risks
+                <p className="text-[#475569] text-base md:text-lg">
+                  Paste any URL or email content to check for phishing, malware, and security risks
                 </p>
               </div>
 
-              <div className="bg-white rounded-2xl border border-gray-200/60 shadow-xl shadow-gray-200/50 p-8 hover:shadow-2xl hover:shadow-blue-500/10 hover:-translate-y-1 transition-all duration-300 ease-out">
-                <form onSubmit={handleSubmit} className="space-y-5">
+              <div className="card p-6">
+                <form onSubmit={handleSubmit} className="space-y-4">
                   <div className="relative">
                     <textarea
                       value={input}
                       onChange={(e) => setInput(e.target.value)}
                       placeholder="https://example.com or paste email content here..."
-                      className="w-full px-5 py-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-base bg-gray-50/50 hover:bg-gray-50 transition-colors duration-200"
-                      rows={6}
+                      className="w-full px-4 py-3 border border-[#e2e8f0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0575E1] focus:border-transparent resize-none text-[15px] bg-white hover:border-[#cbd5e1] transition-colors duration-200 font-mono"
+                      rows={5}
                       required
                       disabled={loading}
                     />
@@ -403,16 +403,16 @@ export default function Home() {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 ease-out disabled:opacity-50 disabled:cursor-not-allowed text-base shadow-lg shadow-blue-600/30 hover:shadow-xl hover:shadow-blue-600/50 hover:-translate-y-0.5 flex items-center justify-center gap-2 group active:scale-98"
+                    className="w-full bg-[#0575E1] hover:bg-[#0560b8] text-white font-semibold py-3 px-5 rounded-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-[15px] flex items-center justify-center gap-2"
                   >
                     {loading ? (
                       <>
-                        <Loader2 className="w-5 h-5 animate-spin" />
+                        <Loader2 className="w-4 h-4 animate-spin" />
                         Analyzing...
                       </>
                     ) : (
                       <>
-                        <Shield className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                        <Shield className="w-4 h-4" />
                         Analyze URLs
                       </>
                     )}
@@ -420,37 +420,37 @@ export default function Home() {
                 </form>
 
                 {error && (
-                  <div className="mt-5 p-4 bg-red-50 border border-red-200 rounded-xl flex items-start gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
-                    <XCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-                    <p className="text-sm text-red-800 font-medium">{error}</p>
+                  <div className="mt-4 p-3 bg-[#fef2f2] border border-[#fecaca] rounded-lg flex items-start gap-3">
+                    <XCircle className="w-4 h-4 text-[#ef4444] flex-shrink-0 mt-0.5" />
+                    <p className="text-sm text-[#dc2626] font-medium">{error}</p>
                   </div>
                 )}
               </div>
 
               {/* Feature Highlights */}
-              <div className="grid md:grid-cols-3 gap-6 mt-12">
-                <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-gray-200/50 hover:bg-white hover:shadow-lg hover:shadow-blue-500/10 hover:border-blue-200 hover:-translate-y-1 transition-all duration-300 ease-out group">
-                  <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-4 group-hover:bg-blue-600 transition-colors duration-300">
-                    <Shield className="w-6 h-6 text-blue-600 group-hover:text-white transition-colors duration-300" />
+              <div className="grid md:grid-cols-3 gap-4 mt-8">
+                <div className="card p-5 transition-all duration-200">
+                  <div className="w-10 h-10 bg-gradient-to-br from-[#0575E1] to-[#0560b8] rounded-lg flex items-center justify-center mb-3">
+                    <Shield className="w-5 h-5 text-white" />
                   </div>
-                  <h3 className="font-semibold text-gray-900 mb-2">Multi-Engine Scanning</h3>
-                  <p className="text-sm text-gray-600">Powered by VirusTotal's 70+ security engines and Google Safe Browsing</p>
+                  <h3 className="font-semibold text-[#08121E] text-[15px] mb-1">Multi-Engine Scanning</h3>
+                  <p className="text-[13px] text-[#64748b]">70+ security engines via VirusTotal & Google Safe Browsing</p>
                 </div>
 
-                <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-gray-200/50 hover:bg-white hover:shadow-lg hover:shadow-green-500/10 hover:border-green-200 hover:-translate-y-1 transition-all duration-300 ease-out group">
-                  <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mb-4 group-hover:bg-green-600 transition-colors duration-300">
-                    <Lock className="w-6 h-6 text-green-600 group-hover:text-white transition-colors duration-300" />
+                <div className="card p-5 transition-all duration-200">
+                  <div className="w-10 h-10 bg-gradient-to-br from-[#10b981] to-[#059669] rounded-lg flex items-center justify-center mb-3">
+                    <Lock className="w-5 h-5 text-white" />
                   </div>
-                  <h3 className="font-semibold text-gray-900 mb-2">SSL & Certificate Analysis</h3>
-                  <p className="text-sm text-gray-600">Verify HTTPS encryption and examine certificate validity</p>
+                  <h3 className="font-semibold text-[#08121E] text-[15px] mb-1">SSL Analysis</h3>
+                  <p className="text-[13px] text-[#64748b]">Verify HTTPS encryption and certificate validity</p>
                 </div>
 
-                <div className="bg-white/60 backdrop-blur-sm rounded-xl p-6 border border-gray-200/50 hover:bg-white hover:shadow-lg hover:shadow-purple-500/10 hover:border-purple-200 hover:-translate-y-1 transition-all duration-300 ease-out group">
-                  <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mb-4 group-hover:bg-purple-600 transition-colors duration-300">
-                    <Globe className="w-6 h-6 text-purple-600 group-hover:text-white transition-colors duration-300" />
+                <div className="card p-5 transition-all duration-200">
+                  <div className="w-10 h-10 bg-gradient-to-br from-[#8b5cf6] to-[#7c3aed] rounded-lg flex items-center justify-center mb-3">
+                    <Globe className="w-5 h-5 text-white" />
                   </div>
-                  <h3 className="font-semibold text-gray-900 mb-2">Domain Intelligence</h3>
-                  <p className="text-sm text-gray-600">Identify newly registered domains often used in phishing</p>
+                  <h3 className="font-semibold text-[#08121E] text-[15px] mb-1">Domain Intelligence</h3>
+                  <p className="text-[13px] text-[#64748b]">Detect newly registered domains used in phishing</p>
                 </div>
               </div>
             </div>
@@ -458,222 +458,184 @@ export default function Home() {
 
           {/* Single URL Result */}
           {result && !loading && (
-            <div className="space-y-6 fade-in">
-              {/* Verdict Card */}
-              <div className={`rounded-2xl border-2 shadow-xl p-8 ${
-                result.verdict === 'SUSPICIOUS'
-                  ? 'bg-gradient-to-br from-red-50 to-red-100/50 border-red-200'
-                  : 'bg-gradient-to-br from-green-50 to-green-100/50 border-green-200'
+            <div className="space-y-4 fade-in">
+              {/* Verdict Header */}
+              <div className={`card overflow-hidden ${
+                result.verdict === 'SUSPICIOUS' ? 'border-[#ef4444]' : 'border-[#10b981]'
               }`}>
-                <div className="flex items-start gap-5">
-                  <div className={`flex-shrink-0 w-20 h-20 rounded-2xl flex items-center justify-center shadow-lg ${
-                    result.verdict === 'SUSPICIOUS' ? 'bg-red-500' : 'bg-green-500'
+                <div className={`px-5 py-3 flex items-center gap-3 ${
+                  result.verdict === 'SUSPICIOUS' ? 'bg-[#fef2f2]' : 'bg-[#ecfdf5]'
+                }`}>
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                    result.verdict === 'SUSPICIOUS' ? 'bg-[#ef4444]' : 'bg-[#10b981]'
                   }`}>
                     {result.verdict === 'SUSPICIOUS' ? (
-                      <AlertTriangle className="w-10 h-10 text-white" />
+                      <AlertTriangle className="w-4 h-4 text-white" />
                     ) : (
-                      <CheckCircle2 className="w-10 h-10 text-white" />
+                      <CheckCircle2 className="w-4 h-4 text-white" />
                     )}
                   </div>
-                  <div className="flex-1">
-                    <h3 className={`text-3xl font-bold mb-2 ${
-                      result.verdict === 'SUSPICIOUS' ? 'text-red-900' : 'text-green-900'
+                  <div>
+                    <h3 className={`text-lg font-bold ${
+                      result.verdict === 'SUSPICIOUS' ? 'text-[#dc2626]' : 'text-[#059669]'
                     }`}>
                       {result.verdict === 'SUSPICIOUS' ? 'Threat Detected' : 'No Threats Found'}
                     </h3>
-                    <p className={`text-lg mb-4 ${
-                      result.verdict === 'SUSPICIOUS' ? 'text-red-700' : 'text-green-700'
-                    }`}>
+                    <p className="text-[13px] text-[#64748b]">
                       {result.verdict === 'SUSPICIOUS'
                         ? 'This URL has been flagged as potentially dangerous'
                         : 'This URL appears to be safe'}
                     </p>
-                    {result.suspicionReasons && result.suspicionReasons.length > 0 && (
-                      <ul className="space-y-2">
-                        {result.suspicionReasons.map((reason, idx) => (
-                          <li key={idx} className="flex items-start gap-2 text-sm text-red-800 bg-white/50 rounded-lg p-3">
-                            <AlertTriangle className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
-                            <span className="font-medium">{reason}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
                   </div>
                 </div>
+
+                {/* URL Display */}
+                <div className="px-5 py-3 border-t border-[#f1f5f9] bg-[#f8fafc]">
+                  <p className="text-[13px] text-[#64748b] font-mono break-all">{result.url}</p>
+                </div>
+
+                {/* Suspicion Reasons */}
+                {result.suspicionReasons && result.suspicionReasons.length > 0 && (
+                  <div className="px-5 py-3 border-t border-[#f1f5f9]">
+                    {result.suspicionReasons.map((reason, idx) => (
+                      <div key={idx} className="flex items-center gap-2 py-1.5 text-[13px] text-[#dc2626]">
+                        <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0" />
+                        <span>{reason}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
-              {/* Analysis Details */}
-              <div className="grid md:grid-cols-2 gap-6">
-                {/* VirusTotal */}
+              {/* Analysis Details Card */}
+              <div className="card">
+                <div className="px-5 py-3 border-b border-[#f1f5f9]">
+                  <h4 className="font-semibold text-[#08121E] text-[15px]">Security Analysis</h4>
+                </div>
+
+                {/* VirusTotal Row */}
                 {result.checks.virustotal && !result.checks.virustotal.error && !result.checks.virustotal.status && (
-                  <div className="bg-white rounded-2xl border border-gray-200/60 shadow-lg p-6 hover:shadow-xl transition-all duration-300">
-                    <div className="flex items-center gap-3 mb-5">
-                      <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
-                        <Shield className="w-5 h-5 text-blue-600" />
-                      </div>
-                      <h4 className="font-semibold text-gray-900 text-lg">VirusTotal</h4>
+                  <div className="status-row">
+                    <div className={`status-icon ${
+                      result.checks.virustotal.malicious > 0 ? 'status-icon-error' : 'status-icon-success'
+                    }`}>
+                      <Shield className="w-4 h-4" />
                     </div>
-                    <div className="grid grid-cols-4 gap-3">
-                      <div className="text-center p-4 bg-gradient-to-br from-red-50 to-red-100 rounded-xl hover:scale-105 transition-transform duration-200">
-                        <div className="text-2xl font-bold text-red-600">{result.checks.virustotal.malicious}</div>
-                        <div className="text-xs text-gray-600 mt-1 font-medium">Malicious</div>
-                      </div>
-                      <div className="text-center p-4 bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl hover:scale-105 transition-transform duration-200">
-                        <div className="text-2xl font-bold text-orange-600">{result.checks.virustotal.suspicious}</div>
-                        <div className="text-xs text-gray-600 mt-1 font-medium">Suspicious</div>
-                      </div>
-                      <div className="text-center p-4 bg-gradient-to-br from-green-50 to-green-100 rounded-xl hover:scale-105 transition-transform duration-200">
-                        <div className="text-2xl font-bold text-green-600">{result.checks.virustotal.harmless}</div>
-                        <div className="text-xs text-gray-600 mt-1 font-medium">Clean</div>
-                      </div>
-                      <div className="text-center p-4 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl hover:scale-105 transition-transform duration-200">
-                        <div className="text-2xl font-bold text-gray-600">{result.checks.virustotal.undetected}</div>
-                        <div className="text-xs text-gray-600 mt-1 font-medium">Undetected</div>
+                    <div className="flex-1 ml-3">
+                      <div className="text-[14px] font-medium text-[#08121E]">VirusTotal</div>
+                      <div className="text-[12px] text-[#64748b]">
+                        {result.checks.virustotal.malicious} malicious · {result.checks.virustotal.suspicious} suspicious · {result.checks.virustotal.harmless} clean
                       </div>
                     </div>
+                    <span className={`badge ${
+                      result.checks.virustotal.malicious > 0 ? 'badge-error' : 'badge-success'
+                    }`}>
+                      {result.checks.virustotal.malicious > 0 ? 'Threats Found' : 'Clean'}
+                    </span>
+                  </div>
+                )}
 
-                    {result.checks.virustotal.detections && result.checks.virustotal.detections.length > 0 && (
-                      <div className="mt-5">
-                        <button
-                          onClick={() => setShowDetections(!showDetections)}
-                          className="text-sm text-blue-600 hover:text-blue-700 font-semibold flex items-center gap-2 hover:gap-3 transition-all duration-200"
-                        >
-                          {showDetections ? (
-                            <ChevronDown className="w-4 h-4" />
-                          ) : (
-                            <ChevronRight className="w-4 h-4" />
-                          )}
-                          {showDetections ? 'Hide' : 'Show'} {result.checks.virustotal.detections.length} engine detections
-                        </button>
-
-                        {showDetections && (
-                          <div className="mt-3 max-h-64 overflow-y-auto border border-gray-200 rounded-xl bg-gray-50">
-                            {result.checks.virustotal.detections.map((detection: any, idx: number) => (
-                              <div key={idx} className="flex justify-between items-center px-4 py-3 border-b border-gray-200 last:border-0 text-sm hover:bg-white transition-colors">
-                                <span className="font-semibold text-gray-800">{detection.engine}</span>
-                                <span className={`px-3 py-1 rounded-lg text-xs font-semibold ${
-                                  detection.category === 'malicious' ? 'bg-red-100 text-red-700' : 'bg-orange-100 text-orange-700'
-                                }`}>
-                                  {detection.result}
-                                </span>
-                              </div>
-                            ))}
+                {/* Detections Expandable */}
+                {result.checks.virustotal?.detections && result.checks.virustotal.detections.length > 0 && (
+                  <div className="px-5 py-2 border-b border-[#f1f5f9] bg-[#fef2f2]">
+                    <button
+                      onClick={() => setShowDetections(!showDetections)}
+                      className="text-[13px] text-[#dc2626] font-medium flex items-center gap-1.5"
+                    >
+                      {showDetections ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+                      {result.checks.virustotal.detections.length} engines flagged this URL
+                    </button>
+                    {showDetections && (
+                      <div className="mt-2 max-h-40 overflow-y-auto">
+                        {result.checks.virustotal.detections.map((detection: any, idx: number) => (
+                          <div key={idx} className="flex justify-between items-center py-1.5 text-[12px]">
+                            <span className="text-[#475569]">{detection.engine}</span>
+                            <span className="text-[#dc2626] font-medium">{detection.result}</span>
                           </div>
-                        )}
+                        ))}
                       </div>
                     )}
                   </div>
                 )}
 
-                {/* Google Safe Browsing */}
+                {/* Google Safe Browsing Row */}
                 {result.checks.safeBrowsing && !result.checks.safeBrowsing.error && (
-                  <div className="bg-white rounded-2xl border border-gray-200/60 shadow-lg p-6 hover:shadow-xl transition-all duration-300">
-                    <div className="flex items-center gap-3 mb-5">
-                      <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
-                        <Globe className="w-5 h-5 text-green-600" />
-                      </div>
-                      <h4 className="font-semibold text-gray-900 text-lg">Google Safe Browsing</h4>
+                  <div className="status-row">
+                    <div className={`status-icon ${
+                      result.checks.safeBrowsing.safe ? 'status-icon-success' : 'status-icon-error'
+                    }`}>
+                      <Globe className="w-4 h-4" />
                     </div>
-                    <div className={`flex items-center gap-3 p-4 rounded-xl ${result.checks.safeBrowsing.safe ? 'bg-green-50' : 'bg-red-50'}`}>
-                      {result.checks.safeBrowsing.safe ? (
-                        <CheckCircle2 className="w-6 h-6 text-green-600" />
-                      ) : (
-                        <AlertTriangle className="w-6 h-6 text-red-600" />
-                      )}
-                      <span className={`text-base font-semibold ${result.checks.safeBrowsing.safe ? 'text-green-700' : 'text-red-700'}`}>
-                        {result.checks.safeBrowsing.safe ? 'No threats detected' : 'Threats detected'}
-                      </span>
+                    <div className="flex-1 ml-3">
+                      <div className="text-[14px] font-medium text-[#08121E]">Google Safe Browsing</div>
+                      <div className="text-[12px] text-[#64748b]">Real-time threat database</div>
                     </div>
+                    <span className={`badge ${
+                      result.checks.safeBrowsing.safe ? 'badge-success' : 'badge-error'
+                    }`}>
+                      {result.checks.safeBrowsing.safe ? 'Safe' : 'Unsafe'}
+                    </span>
                   </div>
                 )}
 
-                {/* SSL Certificate */}
+                {/* SSL Row */}
                 {result.checks.ssl && (
-                  <div className="bg-white rounded-2xl border border-gray-200/60 shadow-lg p-6 hover:shadow-xl transition-all duration-300">
-                    <div className="flex items-center gap-3 mb-5">
-                      <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center">
-                        <Lock className="w-5 h-5 text-purple-600" />
-                      </div>
-                      <h4 className="font-semibold text-gray-900 text-lg">SSL Certificate</h4>
+                  <div className="status-row">
+                    <div className={`status-icon ${
+                      result.checks.ssl.secure ? 'status-icon-success' : 'status-icon-warning'
+                    }`}>
+                      <Lock className="w-4 h-4" />
                     </div>
-                    <div className="space-y-3">
-                      <div className={`flex items-center gap-3 p-3 rounded-xl ${result.checks.ssl.secure ? 'bg-green-50' : 'bg-orange-50'}`}>
-                        <Lock className={`w-5 h-5 ${result.checks.ssl.secure ? 'text-green-600' : 'text-orange-600'}`} />
-                        <span className={`text-sm font-semibold ${result.checks.ssl.secure ? 'text-green-700' : 'text-orange-700'}`}>
-                          {result.checks.ssl.secure ? 'Secure HTTPS' : 'Insecure HTTP'}
-                        </span>
+                    <div className="flex-1 ml-3">
+                      <div className="text-[14px] font-medium text-[#08121E]">SSL Certificate</div>
+                      <div className="text-[12px] text-[#64748b]">
+                        {result.checks.ssl.certificate && !result.checks.ssl.certificate.error
+                          ? `${result.checks.ssl.certificate.issuer} · ${result.checks.ssl.certificate.daysUntilExpiry} days until expiry`
+                          : result.checks.ssl.secure ? 'HTTPS enabled' : 'No HTTPS'}
                       </div>
-                      {result.checks.ssl.certificate && !result.checks.ssl.certificate.error && (
-                        <div className="space-y-2 text-sm bg-gray-50 rounded-xl p-4">
-                          <div className="flex justify-between">
-                            <span className="text-gray-600">Issuer:</span>
-                            <span className="font-medium text-gray-900">{result.checks.ssl.certificate.issuer}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-gray-600">Age:</span>
-                            <span className="font-medium text-gray-900">{result.checks.ssl.certificate.certAge} days</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-gray-600">Expires:</span>
-                            <span className="font-medium text-gray-900">{result.checks.ssl.certificate.daysUntilExpiry} days</span>
-                          </div>
-                        </div>
-                      )}
                     </div>
+                    <span className={`badge ${
+                      result.checks.ssl.secure ? 'badge-success' : 'badge-warning'
+                    }`}>
+                      {result.checks.ssl.secure ? 'Secure' : 'Insecure'}
+                    </span>
                   </div>
                 )}
 
-                {/* Domain Info */}
+                {/* Domain Info Row */}
                 {result.checks.whois && !result.checks.whois.error && (
-                  <div className="bg-white rounded-2xl border border-gray-200/60 shadow-lg p-6 hover:shadow-xl transition-all duration-300">
-                    <div className="flex items-center gap-3 mb-5">
-                      <div className="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center">
-                        <Info className="w-5 h-5 text-indigo-600" />
+                  <div className="status-row">
+                    <div className={`status-icon ${
+                      result.checks.whois.isNew ? 'status-icon-warning' : 'status-icon-neutral'
+                    }`}>
+                      <Info className="w-4 h-4" />
+                    </div>
+                    <div className="flex-1 ml-3">
+                      <div className="text-[14px] font-medium text-[#08121E]">Domain Age</div>
+                      <div className="text-[12px] text-[#64748b]">
+                        {result.checks.whois.domainAge !== null ? `${result.checks.whois.domainAge} days old` : 'Unknown'}
+                        {result.checks.whois.registrar && ` · ${result.checks.whois.registrar}`}
                       </div>
-                      <h4 className="font-semibold text-gray-900 text-lg">Domain Information</h4>
                     </div>
-                    <div className="space-y-2 text-sm bg-gray-50 rounded-xl p-4">
-                      {result.checks.whois.domainAge !== null && result.checks.whois.domainAge !== undefined && (
-                        <div className={`flex justify-between ${result.checks.whois.isNew ? 'text-red-700 font-semibold' : ''}`}>
-                          <span className="text-gray-600">Age:</span>
-                          <span className="font-medium text-gray-900">
-                            {result.checks.whois.domainAge} days
-                            {result.checks.whois.isNew && ' (NEW)'}
-                          </span>
-                        </div>
-                      )}
-                      {result.checks.whois.registrar && (
-                        <div className="flex justify-between">
-                          <span className="text-gray-600">Registrar:</span>
-                          <span className="font-medium text-gray-900">{result.checks.whois.registrar}</span>
-                        </div>
-                      )}
-                      {result.checks.whois.createdDate && (
-                        <div className="flex justify-between">
-                          <span className="text-gray-600">Created:</span>
-                          <span className="font-medium text-gray-900">{new Date(result.checks.whois.createdDate).toLocaleDateString()}</span>
-                        </div>
-                      )}
-                    </div>
+                    <span className={`badge ${
+                      result.checks.whois.isNew ? 'badge-warning' : 'badge-neutral'
+                    }`}>
+                      {result.checks.whois.isNew ? 'New Domain' : 'Established'}
+                    </span>
                   </div>
                 )}
-              </div>
-
-              {/* URL Display */}
-              <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-2xl border border-gray-200 p-5">
-                <p className="text-sm text-gray-600 font-mono break-all">{result.url}</p>
               </div>
 
               {/* Back Button */}
-              <div className="text-center">
+              <div className="text-center pt-2">
                 <button
                   onClick={() => {
                     setResult(null);
                     setInput('');
                   }}
-                  className="inline-flex items-center gap-2 px-8 py-3 bg-white hover:bg-gray-50 text-gray-700 font-semibold rounded-xl transition-all duration-200 border border-gray-200 shadow-lg hover:shadow-xl group"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-white hover:bg-[#f8fafc] text-[#475569] font-medium rounded-md transition-all duration-200 border border-[#e2e8f0] text-[14px]"
                 >
-                  <ChevronRight className="w-4 h-4 rotate-180 group-hover:-translate-x-1 transition-transform" />
+                  <ChevronRight className="w-4 h-4 rotate-180" />
                   Check Another URL
                 </button>
               </div>
@@ -682,90 +644,89 @@ export default function Home() {
 
           {/* Multi URL Results */}
           {multiResult && !loading && (
-            <div className="space-y-6 fade-in">
-              {/* Summary */}
-              <div className="bg-white rounded-2xl border border-gray-200/60 shadow-xl p-8">
-                <h3 className="text-2xl font-bold text-gray-900 mb-6">Scan Results</h3>
-                <div className="grid grid-cols-3 gap-6 mb-6">
-                  <div className="text-center p-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl hover:scale-105 transition-transform duration-200">
-                    <div className="text-5xl font-bold text-gray-900">{multiResult.totalUrls}</div>
-                    <div className="text-sm text-gray-600 mt-2 font-medium">Total URLs</div>
-                  </div>
-                  <div className="text-center p-6 bg-gradient-to-br from-red-50 to-red-100 rounded-2xl hover:scale-105 transition-transform duration-200">
-                    <div className="text-5xl font-bold text-red-600">{multiResult.suspiciousCount}</div>
-                    <div className="text-sm text-gray-600 mt-2 font-medium">Suspicious</div>
-                  </div>
-                  <div className="text-center p-6 bg-gradient-to-br from-green-50 to-green-100 rounded-2xl hover:scale-105 transition-transform duration-200">
-                    <div className="text-5xl font-bold text-green-600">{multiResult.cleanCount}</div>
-                    <div className="text-sm text-gray-600 mt-2 font-medium">Clean</div>
-                  </div>
+            <div className="space-y-4 fade-in">
+              {/* Summary Card */}
+              <div className="card">
+                <div className="px-5 py-4 border-b border-[#f1f5f9]">
+                  <h3 className="text-lg font-bold text-[#08121E]">Scan Results</h3>
                 </div>
-                {multiResult.suspiciousCount > 0 && (
-                  <div className="bg-gradient-to-r from-red-50 to-red-100 border border-red-200 rounded-2xl p-4 flex items-start gap-3">
-                    <AlertTriangle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-                    <p className="text-sm text-red-800 font-semibold">Warning: Suspicious URLs detected. Do not click these links.</p>
+                <div className="p-5">
+                  <div className="grid grid-cols-3 gap-4 mb-4">
+                    <div className="text-center p-4 bg-[#f8fafc] rounded-lg">
+                      <div className="text-3xl font-bold text-[#08121E]">{multiResult.totalUrls}</div>
+                      <div className="text-[12px] text-[#64748b] mt-1">Total URLs</div>
+                    </div>
+                    <div className="text-center p-4 bg-[#fef2f2] rounded-lg">
+                      <div className="text-3xl font-bold text-[#ef4444]">{multiResult.suspiciousCount}</div>
+                      <div className="text-[12px] text-[#64748b] mt-1">Suspicious</div>
+                    </div>
+                    <div className="text-center p-4 bg-[#ecfdf5] rounded-lg">
+                      <div className="text-3xl font-bold text-[#10b981]">{multiResult.cleanCount}</div>
+                      <div className="text-[12px] text-[#64748b] mt-1">Clean</div>
+                    </div>
                   </div>
-                )}
+                  {multiResult.suspiciousCount > 0 && (
+                    <div className="bg-[#fef2f2] border border-[#fecaca] rounded-lg p-3 flex items-center gap-2">
+                      <AlertTriangle className="w-4 h-4 text-[#ef4444] flex-shrink-0" />
+                      <p className="text-[13px] text-[#dc2626] font-medium">Warning: Suspicious URLs detected. Do not click these links.</p>
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* URL List */}
-              <div className="space-y-4">
+              <div className="card overflow-hidden">
                 {multiResult.results.map((res, idx) => (
-                  <div key={idx} className={`bg-white rounded-2xl border-2 shadow-lg p-6 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 ease-out ${
-                    res.verdict === 'SUSPICIOUS' ? 'border-red-200' : 'border-green-200'
+                  <div key={idx} className={`border-b border-[#f1f5f9] last:border-0 ${
+                    res.verdict === 'SUSPICIOUS' ? 'bg-[#fffbfb]' : ''
                   }`}>
-                    <div className="flex items-start gap-4">
-                      <div className={`flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center shadow-md ${
-                        res.verdict === 'SUSPICIOUS' ? 'bg-red-500' : 'bg-green-500'
+                    <div className="p-4 flex items-start gap-3">
+                      <div className={`status-icon flex-shrink-0 ${
+                        res.verdict === 'SUSPICIOUS' ? 'status-icon-error' : 'status-icon-success'
                       }`}>
                         {res.verdict === 'SUSPICIOUS' ? (
-                          <AlertTriangle className="w-6 h-6 text-white" />
+                          <AlertTriangle className="w-4 h-4" />
                         ) : (
-                          <CheckCircle2 className="w-6 h-6 text-white" />
+                          <CheckCircle2 className="w-4 h-4" />
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-mono break-all text-gray-900 mb-3 bg-gray-50 rounded-lg p-3">{res.url}</p>
-                        <div className="flex items-center gap-2 mb-3">
-                          <span className={`px-4 py-2 rounded-lg text-xs font-bold shadow-sm ${
-                            res.verdict === 'SUSPICIOUS'
-                              ? 'bg-red-100 text-red-700'
-                              : 'bg-green-100 text-green-700'
+                        <div className="flex items-center justify-between gap-3 mb-1">
+                          <p className="text-[13px] font-mono break-all text-[#08121E]">{res.url}</p>
+                          <span className={`badge flex-shrink-0 ${
+                            res.verdict === 'SUSPICIOUS' ? 'badge-error' : 'badge-success'
                           }`}>
                             {res.verdict}
                           </span>
                         </div>
+
                         {res.suspicionReasons && res.suspicionReasons.length > 0 && (
-                          <ul className="space-y-1.5 text-xs text-gray-600 mb-3">
+                          <div className="mt-2">
                             {res.suspicionReasons.map((reason, reasonIdx) => (
-                              <li key={reasonIdx} className="flex items-start gap-2 bg-red-50/50 rounded-lg p-2">
-                                <AlertTriangle className="w-3 h-3 text-red-600 flex-shrink-0 mt-0.5" />
+                              <div key={reasonIdx} className="flex items-center gap-1.5 text-[12px] text-[#dc2626] py-0.5">
+                                <AlertTriangle className="w-3 h-3 flex-shrink-0" />
                                 <span>{reason}</span>
-                              </li>
+                              </div>
                             ))}
-                          </ul>
+                          </div>
                         )}
 
                         {res.checks.virustotal?.detections && res.checks.virustotal.detections.length > 0 && (
-                          <div className="mt-3">
+                          <div className="mt-2">
                             <button
                               onClick={() => setExpandedUrlIndex(expandedUrlIndex === idx ? null : idx)}
-                              className="text-sm text-blue-600 hover:text-blue-700 font-semibold flex items-center gap-2 hover:gap-3 transition-all duration-200"
+                              className="text-[12px] text-[#0575E1] font-medium flex items-center gap-1"
                             >
-                              {expandedUrlIndex === idx ? (
-                                <ChevronDown className="w-4 h-4" />
-                              ) : (
-                                <ChevronRight className="w-4 h-4" />
-                              )}
-                              {expandedUrlIndex === idx ? 'Hide' : 'Show'} {res.checks.virustotal.detections.length} engine detections
+                              {expandedUrlIndex === idx ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
+                              {res.checks.virustotal.detections.length} engines flagged
                             </button>
 
                             {expandedUrlIndex === idx && (
-                              <div className="mt-3 max-h-48 overflow-y-auto border border-gray-200 rounded-xl bg-gray-50">
+                              <div className="mt-2 pl-4 border-l-2 border-[#fecaca]">
                                 {res.checks.virustotal.detections.map((detection: any, detIdx: number) => (
-                                  <div key={detIdx} className="flex justify-between items-center px-4 py-3 border-b border-gray-200 last:border-0 text-sm hover:bg-white transition-colors">
-                                    <span className="font-semibold text-gray-800">{detection.engine}</span>
-                                    <span className="text-red-600 font-medium px-3 py-1 bg-red-50 rounded-lg">{detection.result}</span>
+                                  <div key={detIdx} className="flex justify-between items-center py-1 text-[12px]">
+                                    <span className="text-[#475569]">{detection.engine}</span>
+                                    <span className="text-[#dc2626]">{detection.result}</span>
                                   </div>
                                 ))}
                               </div>
@@ -779,15 +740,15 @@ export default function Home() {
               </div>
 
               {/* Back Button */}
-              <div className="text-center">
+              <div className="text-center pt-2">
                 <button
                   onClick={() => {
                     setMultiResult(null);
                     setInput('');
                   }}
-                  className="inline-flex items-center gap-2 px-8 py-3 bg-white hover:bg-gray-50 text-gray-700 font-semibold rounded-xl transition-all duration-200 border border-gray-200 shadow-lg hover:shadow-xl group"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-white hover:bg-[#f8fafc] text-[#475569] font-medium rounded-md transition-all duration-200 border border-[#e2e8f0] text-[14px]"
                 >
-                  <ChevronRight className="w-4 h-4 rotate-180 group-hover:-translate-x-1 transition-transform" />
+                  <ChevronRight className="w-4 h-4 rotate-180" />
                   Check More URLs
                 </button>
               </div>
